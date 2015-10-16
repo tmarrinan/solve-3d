@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>3D Video Player</title>
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+<script type="text/javascript" src="scripts/glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="scripts/stereoVideoWebGL.js"></script>
+<script type="text/javascript">
+var stereoVideo;
+var videoTime;
+var videoAspect;
+var disappearTimeout;
+var videoLoaded;
+var currentMode;
+var currentFormat;
+var seeking;
+var wasPlaying;
+var animationReq;
+
+function init() {
+	document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+	document.body.requestFullscreen = document.body.requestFullscreen || document.body.webkitRequestFullscreen || document.body.mozRequestFullScreen || document.body.msRequestFullscreen;
+
+	videoAspect = 1.777777778;
+	var videoCtx = videoCanvas.getContext('webgl') || videoCanvas.getContext('experimental-webgl');
+	if (videoCtx !== undefined) stereoVideo = new stereoVideoWebGL(videoCtx);
+	else stereoVideo = new stereoVideo2D(videoCanvas.getContext('2d'));
+
+	videoLoaded = false;
+	currentMode = "None";
+	currentFormat = "Side-by-Side RL";
+	seeking = false;
+	wasPlaying = false;
+	videoTime = 0;
+	animationReq = null;
+
+	menuTable.className = "fadeIn";
+	stereoModeOptions.className = "fadeIn";
+	stereoFormatOptions.className = "fadeIn";
+	volumeSliderContainer.className = "fadeIn";
+	videoControls.className = "fadeIn";
+	disappearTimeout = setTimeout(function() {
+		menuTable.className = "fadeOut";
+		stereoModeOptions.className = "fadeOut";
+		stereoFormatOptions.className = "fadeOut";
+		volumeSliderContainer.className = "fadeOut";
+		videoControls.className = "fadeOut";
+		menuTable.style.opacity = 0.0;
+		stereoModeOptions.style.opacity = 0.0;
+		stereoFormatOptions.style.opacity = 0.0;
+		volumeSliderContainer.style.opacity = 0.0;
+		videoControls.style.opacity = 0.0;
+		document.body.style.cursor = "none";
+		disappearTimeout = null;
+	}, 3000);
+
+	var modeRect = stereoMode.getBoundingClientRect();
+	stereoModeOptions.style.left = modeRect.left + "px";
+	stereoModeOptions.style.top = modeRect.bottom + "px";
+	stereoModeOptionsList.style.width = (modeRect.right-modeRect.left) + "px";
+	var formatRect = stereoFormat.getBoundingClientRect();
+	stereoFormatOptions.style.left = formatRect.left + "px";
+	stereoFormatOptions.style.top = formatRect.bottom + "px";
+	stereoFormatOptionsList.style.width = (formatRect.right-formatRect.left) + "px";
+	var volumeRect = volume.getBoundingClientRect();
+	volumeSliderContainer.style.left = (((volumeRect.left + volumeRect.right) / 2) - 21) + "px";
+	volumeSliderContainer.style.top = volumeRect.bottom + "px";
+
+	document.addEventListener('mousemove', mouseMove, false);
+	openVideoFile.addEventListener('click', openVideoFileBrowser, false);
+	openVideoUrl.addEventListener('click', openVideoUrlDialog, false);
+	stereoMode.addEventListener('click', showStereoModeOptions, false);
+	stereoModeOptions.addEventListener('click', changeStereoMode, false);
+	stereoFormat.addEventListener('click', showStereoFormatOptions, false);
+	stereoFormatOptions.addEventListener('click', changeStereoFormat, false);
+	volume.addEventListener('click', showVolumeSliderContainer, false);
+	volumeSlider.addEventListener('input', changeVideoVolume, false);
+
+	videoControlsPlay.addEventListener('click', playVideo, false);
+	videoControlsPause.addEventListener('click', pauseVideo, false);
+	videoControlsSeek.addEventListener('mousedown', startVideoSeek, false);
+	videoControlsSeek.addEventListener('input', videoSeeking, false);
+	videoControlsSeek.addEventListener('mouseup', finishVideoSeek, false);
+	videoControlsFullScreen.addEventListener('click', fullScreenVideo, false);
+	
+	videoFile.addEventListener('change', videoFileSelected, false);
+	videoUrlDialogOpenBtn.addEventListener('click', videoUrlSelected, false);
+	videoErrorDialogCloseBtn.addEventListener('click', videoErrorDialogClosed, false);
+	video.addEventListener('error', videoError, false);
+	video.addEventListener('loadedmetadata', videoMetaData, false);
+	video.addEventListener('canplaythrough', videoCanPlayThrough, false);
+	video.addEventListener('timeupdate', videoTimeUpdate, false);
+
+	resize();
+}
+
+function resize() {
+	var winAspect = window.innerWidth / window.innerHeight;
+	if (winAspect < videoAspect) {
+		videoCanvas.width = window.innerWidth;
+		videoCanvas.height = window.innerWidth / videoAspect;
+		videoCanvas.style.marginLeft = "0px";
+		videoCanvas.style.marginTop = parseInt((window.innerHeight - videoCanvas.height) / 2, 10) + "px";
+	}
+	else {
+		videoCanvas.width = window.innerHeight * videoAspect;
+		videoCanvas.height = window.innerHeight;
+		videoCanvas.style.marginLeft = parseInt((window.innerWidth - videoCanvas.width) / 2, 10) + "px";
+		videoCanvas.style.marginTop = "0px";
+	}
+
+	stereoVideo.resize();
+}
+
+function mouseMove(event) {
+	menuTable.className = "fadeIn";
+	stereoModeOptions.className = "fadeIn";
+	stereoFormatOptions.className = "fadeIn";
+	volumeSliderContainer.className = "fadeIn";
+	videoControls.className = "fadeIn";
+	menuTable.style.opacity = 1.0;
+	stereoModeOptions.style.opacity = 1.0;
+	stereoFormatOptions.style.opacity = 1.0;
+	volumeSliderContainer.style.opacity = 1.0;
+	videoControls.style.opacity = 1.0;
+	document.body.style.cursor = "default";
+	if (disappearTimeout !== null) clearTimeout(disappearTimeout);
+	disappearTimeout = setTimeout(function() {
+		menuTable.className = "fadeOut";
+		stereoModeOptions.className = "fadeOut";
+		stereoFormatOptions.className = "fadeOut";
+		volumeSliderContainer.className = "fadeOut";
+		videoControls.className = "fadeOut";
+		menuTable.style.opacity = 0.0;
+		stereoModeOptions.style.opacity = 0.0;
+		stereoFormatOptions.style.opacity = 0.0;
+		volumeSliderContainer.style.opacity = 0.0;
+		videoControls.style.opacity = 0.0;
+		document.body.style.cursor = "none";
+		disappearTimeout = null;
+	}, 3000);
+}
+
+function openVideoFileBrowser(event) {
+	var evt = document.createEvent("MouseEvents");
+	evt.initMouseEvent("click", true, true, window, 0, event.screenX, event.screenY, event.clientX, event.cleintY, false, false, false, false, 0, null);
+	videoFile.dispatchEvent(evt);
+}
+
+function openVideoUrlDialog(event) {
+	videoUrlDialog.style.display = "block";
+	videoUrlDialogText.focus();
+}
+
+function showStereoModeOptions(event) {
+	if (stereoModeOptions.style.display !== "block")
+		stereoModeOptions.style.display = "block";
+	else
+		stereoModeOptions.style.display = "none";
+}
+
+function changeStereoMode(event) {
+	if (event.target.id === "stereoModeAnaglyph") {
+		stereoModeAnaglyph.innerHTML = "&#x2713; Anaglyph";
+		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
+		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
+		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
+		stereoModeNone.innerHTML = "&#x2751; None";
+
+		if (currentFormat === "Side-by-Side RL")
+			stereoVideo.updateStereoMode("anaglyph-rl");
+		else if (currentFormat === "Side-by-Side LR")
+			stereoVideo.updateStereoMode("anaglyph-lr");
+		else if (currentFormat === "Top-Bottom RL")
+			stereoVideo.updateStereoMode("anaglyph-tb");
+		else
+			stereoVideo.updateStereoMode("anaglyph-bt");
+
+		currentMode = "anaglyph";
+	}
+	else if (event.target.id === "stereoModeInterleave") {
+		stereoModeAnaglyph.innerHTML = "&#x2751; Anaglyph";
+		stereoModeInterleave.innerHTML = "&#x2713; Interleave";
+		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
+		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
+		stereoModeNone.innerHTML = "&#x2751; None";
+
+		if (currentFormat === "Side-by-Side RL")
+			stereoVideo.updateStereoMode("interleave-rl");
+		else if (currentFormat === "Side-by-Side LR")
+			stereoVideo.updateStereoMode("interleave-lr");
+		else if (currentFormat === "Top-Bottom RL")
+			stereoVideo.updateStereoMode("interleave-tb");
+		else
+			stereoVideo.updateStereoMode("interleave-bt");
+
+		currentMode = "interleave";
+	}
+	else if (event.target.id === "stereoModeLeftEye") {
+		stereoModeAnaglyph.innerHTML = "&#x2751; Anaglyph";
+		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
+		stereoModeLeftEye.innerHTML = "&#x2713; Left Eye";
+		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
+		stereoModeNone.innerHTML = "&#x2751; None";
+
+		if (currentFormat === "Side-by-Side RL")
+			stereoVideo.updateStereoMode("right");
+		else if (currentFormat === "Side-by-Side LR")
+			stereoVideo.updateStereoMode("left");
+		else if (currentFormat === "Top-Bottom RL")
+			stereoVideo.updateStereoMode("bottom");
+		else
+			stereoVideo.updateStereoMode("top");
+
+		currentMode = "leftEye";
+	}
+	else if (event.target.id === "stereoModeRightEye") {
+		stereoModeAnaglyph.innerHTML = "&#x2751; Anaglyph";
+		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
+		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
+		stereoModeRightEye.innerHTML = "&#x2713; Right Eye";
+		stereoModeNone.innerHTML = "&#x2751; None";
+
+		if (currentFormat === "Side-by-Side RL")
+			stereoVideo.updateStereoMode("left");
+		else if (currentFormat === "Side-by-Side LR")
+			stereoVideo.updateStereoMode("right");
+		else if (currentFormat === "Top-Bottom RL")
+			stereoVideo.updateStereoMode("top");
+		else
+			stereoVideo.updateStereoMode("bottom");
+
+		currentMode = "rightEye";
+	}
+	else {
+		stereoModeAnaglyph.innerHTML = "&#x2751; Anaglyph";
+		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
+		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
+		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
+		stereoModeNone.innerHTML = "&#x2713; None";
+
+		stereoVideo.updateStereoMode("whole");
+
+		currentMode = "None";
+	}
+}
+
+function showStereoFormatOptions(event) {
+	if (stereoFormatOptions.style.display !== "block")
+		stereoFormatOptions.style.display = "block";
+	else
+		stereoFormatOptions.style.display = "none";
+}
+
+function changeStereoFormat(event) {
+	if (event.target.id === "stereoFormatSideBySideRL") {
+		stereoFormatSideBySideRL.innerHTML = "&#x2713; Side-by-Side RL";
+		stereoFormatSideBySideLR.innerHTML = "&#x2751; Side-by-Side LR";
+		stereoFormatTopBottomRL.innerHTML = "&#x2751; Top-Bottom RL";
+		stereoFormatTopBottomLR.innerHTML = "&#x2751; Top-Bottom LR";
+
+		if (currentMode === "anaglyph")
+			stereoVideo.updateStereoMode("anaglyph-rl");
+		else if (currentMode === "interleave")
+			stereoVideo.updateStereoMode("interleave-rl");
+		else if (currentMode === "leftEye")
+			stereoVideo.updateStereoMode("right");
+		else if (currentMode === "rightEye")
+			stereoVideo.updateStereoMode("left");
+		else
+			stereoVideo.updateStereoMode("whole");
+
+		currentFormat = "Side-by-Side RL";
+	}
+	else if (event.target.id === "stereoFormatSideBySideLR") {
+		stereoFormatSideBySideRL.innerHTML = "&#x2751; Side-by-Side RL";
+		stereoFormatSideBySideLR.innerHTML = "&#x2713; Side-by-Side LR";
+		stereoFormatTopBottomRL.innerHTML = "&#x2751; Top-Bottom RL";
+		stereoFormatTopBottomLR.innerHTML = "&#x2751; Top-Bottom LR";
+
+		if (currentMode === "anaglyph")
+			stereoVideo.updateStereoMode("anaglyph-lr");
+		else if (currentMode === "interleave")
+			stereoVideo.updateStereoMode("interleave-lr");
+		else if (currentMode === "leftEye")
+			stereoVideo.updateStereoMode("left");
+		else if (currentMode === "rightEye")
+			stereoVideo.updateStereoMode("right");
+		else
+			stereoVideo.updateStereoMode("whole");
+
+		currentFormat = "Side-by-Side LR";
+	}
+	else if (event.target.id === "stereoFormatTopBottomRL") {
+		stereoFormatSideBySideRL.innerHTML = "&#x2751; Side-by-Side RL";
+		stereoFormatSideBySideLR.innerHTML = "&#x2751; Side-by-Side LR";
+		stereoFormatTopBottomRL.innerHTML = "&#x2713; Top-Bottom RL";
+		stereoFormatTopBottomLR.innerHTML = "&#x2751; Top-Bottom LR";
+
+		if (currentMode === "anaglyph")
+			stereoVideo.updateStereoMode("anaglyph-tb");
+		else if (currentMode === "interleave")
+			stereoVideo.updateStereoMode("interleave-tb");
+		else if (currentMode === "leftEye")
+			stereoVideo.updateStereoMode("bottom");
+		else if (currentMode === "rightEye")
+			stereoVideo.updateStereoMode("top");
+		else
+			stereoVideo.updateStereoMode("whole");
+
+		currentFormat = "Top-Bottom RL";
+	}
+	else {
+		stereoFormatSideBySideRL.innerHTML = "&#x2751; Side-by-Side RL";
+		stereoFormatSideBySideLR.innerHTML = "&#x2751; Side-by-Side LR";
+		stereoFormatTopBottomRL.innerHTML = "&#x2751; Top-Bottom RL";
+		stereoFormatTopBottomLR.innerHTML = "&#x2713; Top-Bottom LR";
+
+		if (currentMode === "anaglyph")
+			stereoVideo.updateStereoMode("anaglyph-bt");
+		else if (currentMode === "interleave")
+			stereoVideo.updateStereoMode("interleave-bt");
+		else if (currentMode === "leftEye")
+			stereoVideo.updateStereoMode("top");
+		else if (currentMode === "rightEye")
+			stereoVideo.updateStereoMode("bottom");
+		else
+			stereoVideo.updateStereoMode("whole");
+
+		currentFormat = "Top-Bottom LR";
+	}
+}
+
+function showVolumeSliderContainer(event) {
+	if (volumeSliderContainer.style.display !== "block")
+		volumeSliderContainer.style.display = "block";
+	else
+		volumeSliderContainer.style.display = "none";
+}
+
+function changeVideoVolume(event) {
+	video.volume = parseInt(volumeSlider.value, 10) / 100;
+}
+
+function playVideo(event) {
+	if (videoLoaded === true) {
+		videoControlsPlay.style.display = "none";
+		videoControlsPause.style.display = "block";
+		if (animationReq === null) {
+			animationReq = requestAnimationFrame(animateVideo);
+		}
+		video.play();
+	}
+}
+
+function pauseVideo(event) {
+	if (videoLoaded === true) {
+		videoControlsPlay.style.display = "block";
+		videoControlsPause.style.display = "none";
+		if (animationReq !== null) {
+			cancelAnimationFrame(animationReq);
+			animationReq = null;
+		}
+		video.pause();
+	}
+}
+
+function startVideoSeek(event) {
+	if (videoLoaded === true) {
+		seeking = true;
+		wasPlaying = !video.paused;
+		if (wasPlaying === true) {
+			pauseVideo(event);
+		}
+	}
+}
+
+function videoSeeking(event) {
+	if (videoLoaded === true && seeking === true) {
+		videoControlsTime.textContent = secondsToHMMSS((videoControlsSeek.value / 1000.0) * video.duration);
+	}
+}
+
+function finishVideoSeek(event) {
+	if (videoLoaded === true && seeking === true) {
+		seeking = false;
+		video.currentTime = (videoControlsSeek.value / 1000.0) * video.duration;
+		if (wasPlaying === true) {
+			playVideo(event);
+		}
+	}
+}
+
+function fullScreenVideo(event) {
+	var fsElement = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+	if (fsElement === document.body) {
+		document.exitFullscreen();
+	}
+	else {
+		document.body.requestFullscreen();
+	}
+}
+
+function videoFileSelected(event) {
+	if (event.target.files.length > 0) {
+		if (event.target.files[0].type === "video/mp4" || event.target.files[0].type === "video/webm") {
+			if (animationReq !== null) {
+				cancelAnimationFrame(animationReq);
+				animationReq = null;
+			}
+			videoLoaded = false;
+			var videoURL = window.URL.createObjectURL(event.target.files[0]);
+			video.src = videoURL;
+		}
+		else {
+			videoError(event);
+		}
+	}
+}
+
+function videoUrlSelected(event) {
+	if (videoUrlDialogText.value !== "") {
+		if (animationReq !== null) {
+			cancelAnimationFrame(animationReq);
+			animationReq = null;
+		}
+
+		videoLoaded = false;
+		var videoURL = videoUrlDialogText.value;
+		video.crossOrigin = "anonymous";
+		video.src = videoURL;
+		video.load();
+	}
+	
+	videoUrlDialogText.value = "";
+	videoUrlDialog.style.display = "none";
+}
+
+function videoErrorDialogClosed(event) {
+	videoErrorDialog.style.display = "none";
+}
+
+function videoError(event) {
+	videoErrorDialog.style.display = "block";
+}
+
+function videoMetaData(event) {
+	if (event.target.id === "video") {
+		console.log("Full video size: " + event.target.videoWidth + "x" + event.target.videoHeight);
+		videoAspect = event.target.videoWidth / event.target.videoHeight;
+		videoControls.style.display = "block";
+		resize();
+	}
+}
+
+function videoCanPlayThrough(event) {
+	if (event.target.id === "video") {
+		if (videoLoaded === false) {
+			videoLoaded = true;
+			stereoVideo.initTextures(video);
+			stereoVideo.draw();
+			playVideo(event);
+
+			animationReq = requestAnimationFrame(animateVideo);
+		}
+	}
+}
+
+function videoTimeUpdate(event) {
+	if (event.target.id === "video") {
+		if (video.paused === false) {
+			videoControlsTime.textContent = secondsToHMMSS(event.target.currentTime);
+			videoControlsSeek.value = parseInt(1000.0 * (event.target.currentTime / event.target.duration), 10);
+		}
+	}
+}
+
+function animateVideo(timestamp) {
+	stereoVideo.updateTextures(video);
+	stereoVideo.draw();
+
+	var dt = Math.ceil(timestamp - videoTime);
+	if (dt >= 33) {
+		videoTime = timestamp;
+		animationReq = requestAnimationFrame(animateVideo);
+	}
+	else {
+		setTimeout(function() {
+			videoTime = timestamp;
+			animationReq = requestAnimationFrame(animateVideo);
+		}, 33-dt);
+	}
+}
+
+function secondsToHMMSS(sec) {
+	var totalSec = parseInt(sec, 10);
+	var ss = totalSec % 60;
+	var mm = parseInt(totalSec / 60, 10) % 60;
+	var h = parseInt(totalSec / 3600, 10);
+
+	return h + ":" + (mm < 10 ? "0" + mm : mm) + ":" + (ss < 10 ? "0" + ss : ss);
+}
+
+function allNonNullDict(dict) {
+	var key;
+	for (key in dict) {
+		if (dict.hasOwnProperty(key)) {
+			if (dict[key] === null) return false;
+		}
+	}
+	return true;
+}
+
+function httpGet(filename, callback) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", filename, true);
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState === 4) {
+			if (xhr.status === 200) {
+				callback(null, xhr.responseText);
+			} else {
+				callback("Error: File Not Found", null);
+			}
+		}
+	};
+	xhr.send();
+}
+</script>
+</head>
+
+<body onload="init()" onresize="resize()">
+	<canvas id="videoCanvas"></canvas>
+	<div id="menu">
+		<table id="menuTable">
+			<tr>
+				<td id="openVideoFile" class="videoMenuItem">
+					<img class="videoMenuImage" src="images/open_video_file_glow.png" width="32" height="32">
+					<span class="videoMenuText">Open [File]</span>
+				</td>
+				<td id="openVideoUrl" class="videoMenuItem">
+					<img class="videoMenuImage" src="images/open_video_url_glow.png" width="32" height="32">
+					<span class="videoMenuText">Open [URL]</span>
+				</td>
+				<td id="stereoMode" class="videoMenuItem">
+					<img class="videoMenuImage" src="images/stereo_mode_glow.png" width="32" height="32">
+					<span class="videoMenuText">Stereo Mode</span>
+				</td>
+				<td id="stereoFormat" class="videoMenuItem">
+					<img class="videoMenuImage" src="images/stereo_format_glow.png" width="32" height="32">
+					<span class="videoMenuText">Stereo Format</span>
+				</td>
+				<td id="volume" class="videoMenuItem">
+					<img class="videoMenuImage" src="images/volume_glow.png" width="32" height="32">
+					<span class="videoMenuText">Volume</span>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="stereoModeOptions">
+		<ul id="stereoModeOptionsList">
+			<li id="stereoModeAnaglyph" class="videoMenuOptionsOdd">&#x2751; Anaglyph</li>
+			<li id="stereoModeInterleave" class="videoMenuOptionsEven">&#x2751; Interleave</li>
+			<li id="stereoModeLeftEye" class="videoMenuOptionsOdd">&#x2751; Left Eye</li>
+			<li id="stereoModeRightEye" class="videoMenuOptionsEven">&#x2751; Right Eye</li>
+			<li id="stereoModeNone" class="videoMenuOptionsOdd">&#x2713; None</li>
+		</ul>
+	</div>
+	<div id="stereoFormatOptions">
+		<ul id="stereoFormatOptionsList">
+			<li id="stereoFormatSideBySideRL" class="videoMenuOptionsOdd">&#x2713; Side-by-Side RL</li>
+			<li id="stereoFormatSideBySideLR" class="videoMenuOptionsEven">&#x2751; Side-by-Side LR</li>
+			<li id="stereoFormatTopBottomRL" class="videoMenuOptionsOdd">&#x2751; Top-Bottom RL</li>
+			<li id="stereoFormatTopBottomLR" class="videoMenuOptionsEven">&#x2751; Top-Bottom LR</li>
+		</ul>
+	</div>
+	<div id="volumeSliderContainer">
+		<input id="volumeSlider" type="range" min="0" max="100" step="1" value="100">
+	</div>
+	<div id="videoControls">
+		<img id="videoControlsPlay" src="images/play_icon_glow.png" width="42" height="42">
+		<img id="videoControlsPause" src="images/pause_icon_glow.png" width="42" height="42">
+		<input id="videoControlsSeek" type="range" min="0" max="1000" step="1" value="0">
+		<span id="videoControlsTime">0:00:00</span>
+		<img id="videoControlsFullScreen" src="images/fullscreen_icon_glow.png" width="42" height="42">
+	</div>
+
+	<div id="videoUrlDialog">
+		<span id="videoUrlDialogLabel">URL:</span>
+		<input id="videoUrlDialogText" type="text">
+		<div id="videoUrlDialogOpenBtn">Open</div>
+	</div>
+
+	<div id="videoErrorDialog">
+		<p id="videoErrorDialogError">Error: video could not be loaded.</p>
+		<p id="videoErrorDialogExplanation">Ensure that you have selected a valid .mp4 or .webm file.</p>
+		<p id="videoErrorDialogNote">*Note: URLs from certain domains are not able to be loaded.</p>
+		<div id="videoErrorDialogCloseBtn">OK</div>
+	</div>
+
+	<input id="videoFile" type="file" name="videoFile">
+	<video id="video" controls="controls"></video>
+</body>
+</html>
