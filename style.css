@@ -310,6 +310,19 @@ body {
 	text-shadow: 0 0 3px #636363;
 }
 
+.videoMenuOptionsOddNoHover {
+	background-color: rgba(37, 49, 51, 0.8);
+	color: #FFFFFF;
+	text-shadow: 0 0 3px #B3ECF5;
+	font-size: 16px;
+	padding: 4px 8px 4px 8px;
+	list-style-type: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 .fadeOut {
 	-webkit-transition: opacity 750ms ease-in-out;
 	-moz-transition: opacity 750ms ease-in-out;

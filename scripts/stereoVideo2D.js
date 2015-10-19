@@ -20,6 +20,7 @@ stereoVideo2D.prototype.updateTextures = function(videoElement) {
 
 stereoVideo2D.prototype.updateStereoMode = function(mode) {
 	this.stereoMode = mode;
+	if (this.video !== null) this.draw();
 };
 
 stereoVideo2D.prototype.draw = function() {

@@ -15,6 +15,7 @@ var myStereoVideo2D;
 var stereoVideo;
 var videoTime;
 var videoAspect;
+var videoStretch;
 var disappearTimeout;
 var videoLoaded;
 var currentMode;
@@ -30,6 +31,7 @@ function init() {
 	document.body.requestFullscreen = document.body.requestFullscreen || document.body.webkitRequestFullscreen || document.body.mozRequestFullScreen || document.body.msRequestFullscreen;
 
 	videoAspect = 1.777777778;
+	videoStretch = 1.0;
 	supportsWebGL = false;
 	videoCtxWebGL = videoCanvasWebGL.getContext('webgl') || videoCanvasWebGL.getContext('experimental-webgl');
 	videoCtx2D = videoCanvas2D.getContext('2d');
@@ -200,14 +202,22 @@ function changeStereoMode(event) {
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
 		stereoModeNone.innerHTML = "&#x2751; None";
 
-		if (currentFormat === "Side-by-Side RL")
-			stereoVideo.updateStereoMode("anaglyph-rl");
-		else if (currentFormat === "Side-by-Side LR")
-			stereoVideo.updateStereoMode("anaglyph-lr");
-		else if (currentFormat === "Top-Bottom RL")
-			stereoVideo.updateStereoMode("anaglyph-tb");
-		else
-			stereoVideo.updateStereoMode("anaglyph-bt");
+		if (currentFormat === "Side-by-Side RL") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph-rl");
+			myStereoVideo2D.updateStereoMode("anaglyph-rl");
+		}
+		else if (currentFormat === "Side-by-Side LR") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph-lr");
+			myStereoVideo2D.updateStereoMode("anaglyph-lr");
+		}
+		else if (currentFormat === "Top-Bottom RL") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph-tb");
+			myStereoVideo2D.updateStereoMode("anaglyph-tb");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("anaglyph-bt");
+			myStereoVideo2D.updateStereoMode("anaglyph-bt");
+		}
 
 		currentMode = "anaglyph";
 	}
@@ -218,14 +228,22 @@ function changeStereoMode(event) {
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
 		stereoModeNone.innerHTML = "&#x2751; None";
 
-		if (currentFormat === "Side-by-Side RL")
-			stereoVideo.updateStereoMode("interleave-rl");
-		else if (currentFormat === "Side-by-Side LR")
-			stereoVideo.updateStereoMode("interleave-lr");
-		else if (currentFormat === "Top-Bottom RL")
-			stereoVideo.updateStereoMode("interleave-tb");
-		else
-			stereoVideo.updateStereoMode("interleave-bt");
+		if (currentFormat === "Side-by-Side RL") {
+			myStereoVideoWebGL.updateStereoMode("interleave-rl");
+			myStereoVideo2D.updateStereoMode("interleave-rl");
+		}
+		else if (currentFormat === "Side-by-Side LR") {
+			myStereoVideoWebGL.updateStereoMode("interleave-lr");
+			myStereoVideo2D.updateStereoMode("interleave-lr");
+		}
+		else if (currentFormat === "Top-Bottom RL") {
+			myStereoVideoWebGL.updateStereoMode("interleave-tb");
+			myStereoVideo2D.updateStereoMode("interleave-tb");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("interleave-bt");
+			myStereoVideo2D.updateStereoMode("interleave-bt");
+		}
 
 		currentMode = "interleave";
 	}
@@ -236,14 +254,22 @@ function changeStereoMode(event) {
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
 		stereoModeNone.innerHTML = "&#x2751; None";
 
-		if (currentFormat === "Side-by-Side RL")
-			stereoVideo.updateStereoMode("right");
-		else if (currentFormat === "Side-by-Side LR")
-			stereoVideo.updateStereoMode("left");
-		else if (currentFormat === "Top-Bottom RL")
-			stereoVideo.updateStereoMode("bottom");
-		else
-			stereoVideo.updateStereoMode("top");
+		if (currentFormat === "Side-by-Side RL") {
+			myStereoVideoWebGL.updateStereoMode("right");
+			myStereoVideo2D.updateStereoMode("right");
+		}
+		else if (currentFormat === "Side-by-Side LR") {
+			myStereoVideoWebGL.updateStereoMode("left");
+			myStereoVideo2D.updateStereoMode("left");
+		}
+		else if (currentFormat === "Top-Bottom RL") {
+			myStereoVideoWebGL.updateStereoMode("bottom");
+			myStereoVideo2D.updateStereoMode("bottom");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("top");
+			myStereoVideo2D.updateStereoMode("top");
+		}
 
 		currentMode = "leftEye";
 	}
@@ -254,14 +280,22 @@ function changeStereoMode(event) {
 		stereoModeRightEye.innerHTML = "&#x2713; Right Eye";
 		stereoModeNone.innerHTML = "&#x2751; None";
 
-		if (currentFormat === "Side-by-Side RL")
-			stereoVideo.updateStereoMode("left");
-		else if (currentFormat === "Side-by-Side LR")
-			stereoVideo.updateStereoMode("right");
-		else if (currentFormat === "Top-Bottom RL")
-			stereoVideo.updateStereoMode("top");
-		else
-			stereoVideo.updateStereoMode("bottom");
+		if (currentFormat === "Side-by-Side RL") {
+			myStereoVideoWebGL.updateStereoMode("left");
+			myStereoVideo2D.updateStereoMode("left");
+		}
+		else if (currentFormat === "Side-by-Side LR") {
+			myStereoVideoWebGL.updateStereoMode("right");
+			myStereoVideo2D.updateStereoMode("right");
+		}
+		else if (currentFormat === "Top-Bottom RL") {
+			myStereoVideoWebGL.updateStereoMode("top");
+			myStereoVideo2D.updateStereoMode("top");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("bottom");
+			myStereoVideo2D.updateStereoMode("bottom");
+		}
 
 		currentMode = "rightEye";
 	}
@@ -272,7 +306,8 @@ function changeStereoMode(event) {
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
 		stereoModeNone.innerHTML = "&#x2713; None";
 
-		stereoVideo.updateStereoMode("whole");
+		myStereoVideoWebGL.updateStereoMode("whole");
+		myStereoVideo2D.updateStereoMode("whole");
 
 		currentMode = "None";
 	}
@@ -286,22 +321,35 @@ function showStereoFormatOptions(event) {
 }
 
 function changeStereoFormat(event) {
+	var videoWidth;
+	var videoHeight;
+
 	if (event.target.id === "stereoFormatSideBySideRL") {
 		stereoFormatSideBySideRL.innerHTML = "&#x2713; Side-by-Side RL";
 		stereoFormatSideBySideLR.innerHTML = "&#x2751; Side-by-Side LR";
 		stereoFormatTopBottomRL.innerHTML = "&#x2751; Top-Bottom RL";
 		stereoFormatTopBottomLR.innerHTML = "&#x2751; Top-Bottom LR";
 
-		if (currentMode === "anaglyph")
-			stereoVideo.updateStereoMode("anaglyph-rl");
-		else if (currentMode === "interleave")
-			stereoVideo.updateStereoMode("interleave-rl");
-		else if (currentMode === "leftEye")
-			stereoVideo.updateStereoMode("right");
-		else if (currentMode === "rightEye")
-			stereoVideo.updateStereoMode("left");
-		else
-			stereoVideo.updateStereoMode("whole");
+		if (currentMode === "anaglyph") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph-rl");
+			myStereoVideo2D.updateStereoMode("anaglyph-rl");
+		}
+		else if (currentMode === "interleave") {
+			myStereoVideoWebGL.updateStereoMode("interleave-rl");
+			myStereoVideo2D.updateStereoMode("interleave-rl");
+		}
+		else if (currentMode === "leftEye") {
+			myStereoVideoWebGL.updateStereoMode("right");
+			myStereoVideo2D.updateStereoMode("right");
+		}
+		else if (currentMode === "rightEye") {
+			myStereoVideoWebGL.updateStereoMode("left");
+			myStereoVideo2D.updateStereoMode("left");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("whole");
+			myStereoVideo2D.updateStereoMode("whole");
+		}
 
 		currentFormat = "Side-by-Side RL";
 	}
@@ -311,16 +359,26 @@ function changeStereoFormat(event) {
 		stereoFormatTopBottomRL.innerHTML = "&#x2751; Top-Bottom RL";
 		stereoFormatTopBottomLR.innerHTML = "&#x2751; Top-Bottom LR";
 
-		if (currentMode === "anaglyph")
-			stereoVideo.updateStereoMode("anaglyph-lr");
-		else if (currentMode === "interleave")
-			stereoVideo.updateStereoMode("interleave-lr");
-		else if (currentMode === "leftEye")
-			stereoVideo.updateStereoMode("left");
-		else if (currentMode === "rightEye")
-			stereoVideo.updateStereoMode("right");
-		else
-			stereoVideo.updateStereoMode("whole");
+		if (currentMode === "anaglyph") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph-lr");
+			myStereoVideo2D.updateStereoMode("anaglyph-lr");
+		}
+		else if (currentMode === "interleave") {
+			myStereoVideoWebGL.updateStereoMode("interleave-lr");
+			myStereoVideo2D.updateStereoMode("interleave-lr");
+		}
+		else if (currentMode === "leftEye") {
+			myStereoVideoWebGL.updateStereoMode("left");
+			myStereoVideo2D.updateStereoMode("left");
+		}
+		else if (currentMode === "rightEye") {
+			myStereoVideoWebGL.updateStereoMode("right");
+			myStereoVideo2D.updateStereoMode("right");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("whole");
+			myStereoVideo2D.updateStereoMode("whole");
+		}
 
 		currentFormat = "Side-by-Side LR";
 	}
@@ -330,37 +388,98 @@ function changeStereoFormat(event) {
 		stereoFormatTopBottomRL.innerHTML = "&#x2713; Top-Bottom RL";
 		stereoFormatTopBottomLR.innerHTML = "&#x2751; Top-Bottom LR";
 
-		if (currentMode === "anaglyph")
-			stereoVideo.updateStereoMode("anaglyph-tb");
-		else if (currentMode === "interleave")
-			stereoVideo.updateStereoMode("interleave-tb");
-		else if (currentMode === "leftEye")
-			stereoVideo.updateStereoMode("bottom");
-		else if (currentMode === "rightEye")
-			stereoVideo.updateStereoMode("top");
-		else
-			stereoVideo.updateStereoMode("whole");
+		if (currentMode === "anaglyph") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph-tb");
+			myStereoVideo2D.updateStereoMode("anaglyph-tb");
+		}
+		else if (currentMode === "interleave") {
+			myStereoVideoWebGL.updateStereoMode("interleave-tb");
+			myStereoVideo2D.updateStereoMode("interleave-tb");
+		}
+		else if (currentMode === "leftEye") {
+			myStereoVideoWebGL.updateStereoMode("bottom");
+			myStereoVideo2D.updateStereoMode("bottom");
+		}
+		else if (currentMode === "rightEye") {
+			myStereoVideoWebGL.updateStereoMode("top");
+			myStereoVideo2D.updateStereoMode("top");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("whole");
+			myStereoVideo2D.updateStereoMode("whole");
+		}
 
 		currentFormat = "Top-Bottom RL";
 	}
-	else {
+	else if (event.target.id === "stereoFormatTopBottomLR") {
 		stereoFormatSideBySideRL.innerHTML = "&#x2751; Side-by-Side RL";
 		stereoFormatSideBySideLR.innerHTML = "&#x2751; Side-by-Side LR";
 		stereoFormatTopBottomRL.innerHTML = "&#x2751; Top-Bottom RL";
 		stereoFormatTopBottomLR.innerHTML = "&#x2713; Top-Bottom LR";
 
-		if (currentMode === "anaglyph")
-			stereoVideo.updateStereoMode("anaglyph-bt");
-		else if (currentMode === "interleave")
-			stereoVideo.updateStereoMode("interleave-bt");
-		else if (currentMode === "leftEye")
-			stereoVideo.updateStereoMode("top");
-		else if (currentMode === "rightEye")
-			stereoVideo.updateStereoMode("bottom");
-		else
-			stereoVideo.updateStereoMode("whole");
+		if (currentMode === "anaglyph") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph-bt");
+			myStereoVideo2D.updateStereoMode("anaglyph-bt");
+		}
+		else if (currentMode === "interleave") {
+			myStereoVideoWebGL.updateStereoMode("interleave-bt");
+			myStereoVideo2D.updateStereoMode("interleave-bt");
+		}
+		else if (currentMode === "leftEye") {
+			myStereoVideoWebGL.updateStereoMode("top");
+			myStereoVideo2D.updateStereoMode("top");
+		}
+		else if (currentMode === "rightEye") {
+			myStereoVideoWebGL.updateStereoMode("bottom");
+			myStereoVideo2D.updateStereoMode("bottom");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("whole");
+			myStereoVideo2D.updateStereoMode("whole");
+		}
 
 		currentFormat = "Top-Bottom LR";
+	}
+	// stretch formats
+	else if (event.target.id === "stereoFormatNativeResolution") {
+		videoStretch = 1.0;
+
+		stereoFormatNativeResolution.innerHTML = "&#x2713; Native Resolution";
+		stereoFormat2XResolution.innerHTML = "&#x2751; 2X Resolution";
+
+		if (videoLoaded === true) {
+			if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
+				videoWidth = parseInt(video.videoWidth / videoStretch, 10);
+				videoHeight = video.videoHeight;
+			}
+			else {
+				videoWidth = video.videoWidth;
+				videoHeight = parseInt(video.videoHeight / videoStretch, 10);
+			}
+			console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
+			videoAspect = videoWidth / videoHeight;
+			resize();
+		}
+	}
+	else if (event.target.id === "stereoFormat2XResolution") {
+		videoStretch = 2.0;
+
+		stereoFormatNativeResolution.innerHTML = "&#x2751; Native Resolution";
+		stereoFormat2XResolution.innerHTML = "&#x2713; 2X Resolution";
+
+		if (videoLoaded === true) {
+			if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
+				videoWidth = parseInt(video.videoWidth / videoStretch, 10);
+				videoHeight = video.videoHeight;
+			}
+			else {
+				videoWidth = video.videoWidth;
+				videoHeight = parseInt(video.videoHeight / videoStretch, 10);
+			}
+			console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
+			videoAspect = videoWidth / videoHeight;
+			resize();
+		}
 	}
 }
 
@@ -533,7 +652,18 @@ function videoError(event) {
 function videoMetaData(event) {
 	if (event.target.id === "video") {
 		console.log("Full video size: " + event.target.videoWidth + "x" + event.target.videoHeight);
-		videoAspect = event.target.videoWidth / event.target.videoHeight;
+		var videoWidth;
+		var videoHeight;
+		if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
+			videoWidth = parseInt(event.target.videoWidth / videoStretch, 10);
+			videoHeight = event.target.videoHeight;
+		}
+		else {
+			videoWidth = event.target.videoWidth;
+			videoHeight = parseInt(event.target.videoHeight / videoStretch, 10);
+		}
+		console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
+		videoAspect = videoWidth / videoHeight;
 		videoControls.style.display = "block";
 		changeStereoMode({target: {id: "stereoModeNone"}});
 		resize();
@@ -543,7 +673,6 @@ function videoMetaData(event) {
 function videoCanPlayThrough(event) {
 	if (event.target.id === "video") {
 		if (videoLoaded === false) {
-			console.log("video can play");
 			videoLoaded = true;
 			stereoVideo.initTextures(video);
 			stereoVideo.draw();
@@ -660,6 +789,9 @@ function httpGet(filename, callback) {
 			<li id="stereoFormatSideBySideLR" class="videoMenuOptionsEven">&#x2751; Side-by-Side LR</li>
 			<li id="stereoFormatTopBottomRL" class="videoMenuOptionsOdd">&#x2751; Top-Bottom RL</li>
 			<li id="stereoFormatTopBottomLR" class="videoMenuOptionsEven">&#x2751; Top-Bottom LR</li>
+			<li id="stereoFormatHorizontalLine" class="videoMenuOptionsOddNoHover"><hr></li>
+			<li id="stereoFormatNativeResolution" class="videoMenuOptionsEven">&#x2713; Native Resolution</li>
+			<li id="stereoFormat2XResolution" class="videoMenuOptionsOdd">&#x2751; 2X Resolution</li>
 		</ul>
 	</div>
 	<div id="volumeSliderContainer">
