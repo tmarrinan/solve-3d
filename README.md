@@ -29,4 +29,4 @@ Rendering
 
 #### Live Site
 
-Use without downloading by visiting (http://www.mcs.anl.gov/~marrinan/solve-3d/)[http://www.mcs.anl.gov/~marrinan/solve-3d/]
+Use without downloading by visiting [http://www.mcs.anl.gov/~marrinan/solve-3d/](http://www.mcs.anl.gov/~marrinan/solve-3d/)
