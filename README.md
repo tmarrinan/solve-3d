@@ -13,8 +13,8 @@ Supported formats:
  * Top-bottom (left eye, right eye)
 
 Video size
- * rendered at view resolution (each eye is squished)
- * rendered at 2x view resolution (each eye is native resolution) **TODO**
+ * rendered at view resolution (image for each eye is squished)
+ * rendered at 2x view resolution (image for each eye is native resolution) **TODO**
 
 Playback options
  * Anaglyph (red-blue)
