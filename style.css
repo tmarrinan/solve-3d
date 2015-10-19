@@ -283,6 +283,11 @@ body {
 	background-color: rgba(82, 108, 112, 0.8);
 }
 
+.videoMenuOptionsEven[active=false] {
+	color: #787878;
+	text-shadow: 0 0 3px #636363;
+}
+
 .videoMenuOptionsOdd {
 	background-color: rgba(37, 49, 51, 0.8);
 	color: #FFFFFF;
@@ -298,6 +303,11 @@ body {
 
 .videoMenuOptionsOdd:hover {
 	background-color: rgba(82, 108, 112, 0.8);
+}
+
+.videoMenuOptionsOdd[active=false] {
+	color: #787878;
+	text-shadow: 0 0 3px #636363;
 }
 
 .fadeOut {

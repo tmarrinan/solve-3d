@@ -5,7 +5,13 @@
 <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
 <script type="text/javascript" src="scripts/glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="scripts/stereoVideoWebGL.js"></script>
+<script type="text/javascript" src="scripts/stereoVideo2D.js"></script>
 <script type="text/javascript">
+var supportsWebGL;
+var videoCtxWebGL;
+var videoCtx2D;
+var myStereoVideoWebGL;
+var myStereoVideo2D;
 var stereoVideo;
 var videoTime;
 var videoAspect;
@@ -16,15 +22,27 @@ var currentFormat;
 var seeking;
 var wasPlaying;
 var animationReq;
+var animationTimeout;
+var loadWithAnonymousURL;
 
 function init() {
 	document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
 	document.body.requestFullscreen = document.body.requestFullscreen || document.body.webkitRequestFullscreen || document.body.mozRequestFullScreen || document.body.msRequestFullscreen;
 
 	videoAspect = 1.777777778;
-	var videoCtx = videoCanvas.getContext('webgl') || videoCanvas.getContext('experimental-webgl');
-	if (videoCtx !== undefined) stereoVideo = new stereoVideoWebGL(videoCtx);
-	else stereoVideo = new stereoVideo2D(videoCanvas.getContext('2d'));
+	supportsWebGL = false;
+	videoCtxWebGL = videoCanvasWebGL.getContext('webgl') || videoCanvasWebGL.getContext('experimental-webgl');
+	videoCtx2D = videoCanvas2D.getContext('2d');
+	myStereoVideoWebGL = new stereoVideoWebGL(videoCtxWebGL);
+	myStereoVideo2D = new stereoVideo2D(videoCtx2D);
+	if (videoCtxWebGL !== undefined) {
+		supportsWebGL = true;
+		videoCanvas2D.style.display = "none";
+	}
+	else {
+		videoCanvasWebGL.style.display = "none";
+	}
+	stereoVideo = null;
 
 	videoLoaded = false;
 	currentMode = "None";
@@ -33,6 +51,8 @@ function init() {
 	wasPlaying = false;
 	videoTime = 0;
 	animationReq = null;
+	animationTimeout = null;
+	loadWithAnonymousURL = false;
 
 	menuTable.className = "fadeIn";
 	stereoModeOptions.className = "fadeIn";
@@ -97,19 +117,29 @@ function init() {
 function resize() {
 	var winAspect = window.innerWidth / window.innerHeight;
 	if (winAspect < videoAspect) {
-		videoCanvas.width = window.innerWidth;
-		videoCanvas.height = window.innerWidth / videoAspect;
-		videoCanvas.style.marginLeft = "0px";
-		videoCanvas.style.marginTop = parseInt((window.innerHeight - videoCanvas.height) / 2, 10) + "px";
+		videoCanvasWebGL.width = window.innerWidth;
+		videoCanvasWebGL.height = window.innerWidth / videoAspect;
+		videoCanvasWebGL.style.marginLeft = "0px";
+		videoCanvasWebGL.style.marginTop = parseInt((window.innerHeight - videoCanvasWebGL.height) / 2, 10) + "px";
+
+		videoCanvas2D.width = window.innerWidth;
+		videoCanvas2D.height = window.innerWidth / videoAspect;
+		videoCanvas2D.style.marginLeft = "0px";
+		videoCanvas2D.style.marginTop = parseInt((window.innerHeight - videoCanvas2D.height) / 2, 10) + "px";
 	}
 	else {
-		videoCanvas.width = window.innerHeight * videoAspect;
-		videoCanvas.height = window.innerHeight;
-		videoCanvas.style.marginLeft = parseInt((window.innerWidth - videoCanvas.width) / 2, 10) + "px";
-		videoCanvas.style.marginTop = "0px";
+		videoCanvasWebGL.width = window.innerHeight * videoAspect;
+		videoCanvasWebGL.height = window.innerHeight;
+		videoCanvasWebGL.style.marginLeft = parseInt((window.innerWidth - videoCanvasWebGL.width) / 2, 10) + "px";
+		videoCanvasWebGL.style.marginTop = "0px";
+
+		videoCanvas2D.width = window.innerHeight * videoAspect;
+		videoCanvas2D.height = window.innerHeight;
+		videoCanvas2D.style.marginLeft = parseInt((window.innerWidth - videoCanvas2D.width) / 2, 10) + "px";
+		videoCanvas2D.style.marginTop = "0px";
 	}
 
-	stereoVideo.resize();
+	if (stereoVideo) stereoVideo.resize();
 }
 
 function mouseMove(event) {
@@ -149,6 +179,7 @@ function openVideoFileBrowser(event) {
 
 function openVideoUrlDialog(event) {
 	videoUrlDialog.style.display = "block";
+	videoUrlDialogText.value = "";
 	videoUrlDialogText.focus();
 }
 
@@ -161,6 +192,8 @@ function showStereoModeOptions(event) {
 
 function changeStereoMode(event) {
 	if (event.target.id === "stereoModeAnaglyph") {
+		if (stereoVideo instanceof stereoVideo2D) return;
+
 		stereoModeAnaglyph.innerHTML = "&#x2713; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
@@ -357,6 +390,10 @@ function pauseVideo(event) {
 	if (videoLoaded === true) {
 		videoControlsPlay.style.display = "block";
 		videoControlsPause.style.display = "none";
+		if (animationTimeout !== null) {
+			clearTimeout(animationTimeout);
+			animationTimeout = null;
+		}
 		if (animationReq !== null) {
 			cancelAnimationFrame(animationReq);
 			animationReq = null;
@@ -404,15 +441,35 @@ function fullScreenVideo(event) {
 function videoFileSelected(event) {
 	if (event.target.files.length > 0) {
 		if (event.target.files[0].type === "video/mp4" || event.target.files[0].type === "video/webm") {
+			if (animationTimeout !== null) {
+				clearTimeout(animationTimeout);
+				animationTimeout = null;
+			}
 			if (animationReq !== null) {
 				cancelAnimationFrame(animationReq);
 				animationReq = null;
 			}
+
+			if (supportsWebGL === true) {
+				stereoVideo = myStereoVideoWebGL;
+				videoCanvasWebGL.style.display = "block";
+				videoCanvas2D.style.display = "none";
+				stereoModeAnaglyph.setAttribute("active", true);
+			}
+			else {
+				stereoVideo = myStereoVideo2D;
+				videoCanvasWebGL.style.display = "none";
+				videoCanvas2D.style.display = "block";
+				stereoModeAnaglyph.setAttribute("active", false);
+			}
+
 			videoLoaded = false;
+			loadWithAnonymousURL = false;
 			var videoURL = window.URL.createObjectURL(event.target.files[0]);
 			video.src = videoURL;
 		}
 		else {
+			loadWithAnonymousURL = false;
 			videoError(event);
 		}
 	}
@@ -420,19 +477,35 @@ function videoFileSelected(event) {
 
 function videoUrlSelected(event) {
 	if (videoUrlDialogText.value !== "") {
+		if (animationTimeout !== null) {
+			clearTimeout(animationTimeout);
+			animationTimeout = null;
+		}
 		if (animationReq !== null) {
 			cancelAnimationFrame(animationReq);
 			animationReq = null;
 		}
 
+		if (supportsWebGL === true) {
+			stereoVideo = myStereoVideoWebGL;
+			videoCanvasWebGL.style.display = "block";
+			videoCanvas2D.style.display = "none";
+			stereoModeAnaglyph.setAttribute("active", true);
+		}
+		else {
+			stereoVideo = myStereoVideo2D;
+			videoCanvasWebGL.style.display = "none";
+			videoCanvas2D.style.display = "block";
+			stereoModeAnaglyph.setAttribute("active", false);
+		}
+
 		videoLoaded = false;
+		loadWithAnonymousURL = true;
 		var videoURL = videoUrlDialogText.value;
 		video.crossOrigin = "anonymous";
 		video.src = videoURL;
-		video.load();
 	}
 	
-	videoUrlDialogText.value = "";
 	videoUrlDialog.style.display = "none";
 }
 
@@ -441,7 +514,20 @@ function videoErrorDialogClosed(event) {
 }
 
 function videoError(event) {
-	videoErrorDialog.style.display = "block";
+	if (loadWithAnonymousURL === true) {
+		video.removeAttribute("crossOrigin");
+		video.src = videoUrlDialogText.value;
+		loadWithAnonymousURL = false;
+
+		stereoVideo = myStereoVideo2D;
+		videoCanvasWebGL.style.display = "none";
+		videoCanvas2D.style.display = "block";
+		console.log("WARNING: Cross-Origin Video not supported in WebGL. Using 2D Canvas instead.");
+		stereoModeAnaglyph.setAttribute("active", false);
+	}
+	else {
+		videoErrorDialog.style.display = "block";
+	}
 }
 
 function videoMetaData(event) {
@@ -449,6 +535,7 @@ function videoMetaData(event) {
 		console.log("Full video size: " + event.target.videoWidth + "x" + event.target.videoHeight);
 		videoAspect = event.target.videoWidth / event.target.videoHeight;
 		videoControls.style.display = "block";
+		changeStereoMode({target: {id: "stereoModeNone"}});
 		resize();
 	}
 }
@@ -456,6 +543,7 @@ function videoMetaData(event) {
 function videoCanPlayThrough(event) {
 	if (event.target.id === "video") {
 		if (videoLoaded === false) {
+			console.log("video can play");
 			videoLoaded = true;
 			stereoVideo.initTextures(video);
 			stereoVideo.draw();
@@ -485,7 +573,7 @@ function animateVideo(timestamp) {
 		animationReq = requestAnimationFrame(animateVideo);
 	}
 	else {
-		setTimeout(function() {
+		animationTimeout = setTimeout(function() {
 			videoTime = timestamp;
 			animationReq = requestAnimationFrame(animateVideo);
 		}, 33-dt);
@@ -529,7 +617,8 @@ function httpGet(filename, callback) {
 </head>
 
 <body onload="init()" onresize="resize()">
-	<canvas id="videoCanvas"></canvas>
+	<canvas id="videoCanvasWebGL"></canvas>
+	<canvas id="videoCanvas2D"></canvas>
 	<div id="menu">
 		<table id="menuTable">
 			<tr>

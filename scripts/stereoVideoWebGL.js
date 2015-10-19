@@ -1,6 +1,8 @@
 "use strict";
 
 function stereoVideoWebGL(ctx) {
+	if (ctx === undefined || ctx === null) return;
+
 	this.gl = ctx;
 	this.shaderProgram = null;
 	this.pMatrix = null;
@@ -158,6 +160,8 @@ stereoVideoWebGL.prototype.initTextures = function(videoElement) {
 };
 
 stereoVideoWebGL.prototype.updateTextures = function(videoElement) {
+	if (this.rgbaTexture === null) return;
+	
 	this.gl.bindTexture(this.gl.TEXTURE_2D, this.rgbaTexture);
 	this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, videoElement);
 	this.gl.bindTexture(this.gl.TEXTURE_2D, null);
