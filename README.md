@@ -12,9 +12,9 @@ Supported formats:
  * Top-bottom (right eye, left eye)
  * Top-bottom (left eye, right eye)
 
-Video size
- * saved at native video resolution (image for each eye is squished)
- * saved at 2x native video resolution (image for each eye is native resolution)
+Supported video sizes
+ * Saved at native video resolution (image for each eye is squished)
+ * Saved at 2x native video resolution (image for each eye is native resolution)
 
 Playback options
  * Anaglyph (red-blue)
