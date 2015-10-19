@@ -481,6 +481,8 @@ function changeStereoFormat(event) {
 			resize();
 		}
 	}
+
+	if (videoLoaded === true) stereoVideo.draw();
 }
 
 function showVolumeSliderContainer(event) {
