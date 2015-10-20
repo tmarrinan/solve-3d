@@ -27,6 +27,7 @@ var wasPlaying;
 var animationReq;
 var animationTimeout;
 var loadWithAnonymousURL;
+var loadAnimationReq;
 
 function init() {
 	document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
@@ -59,6 +60,7 @@ function init() {
 	animationReq = null;
 	animationTimeout = null;
 	loadWithAnonymousURL = false;
+	loadAnimationReq = null;
 
 	menuTable.className = "fadeIn";
 	stereoModeOptions.className = "fadeIn";

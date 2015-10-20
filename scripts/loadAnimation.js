@@ -21,7 +21,6 @@ loadAnimation.prototype.draw = function(timestamp) {
 	var x;
 	var y;
 
-	//this.ctx.lineWidth = 0.05 * minDim;
 	var highlight = parseInt(this.t / 100, 10) % 10;
 	for (i=0; i<10; i++) {
 		theta += 36 * Math.PI/180;
