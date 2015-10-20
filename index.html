@@ -357,6 +357,16 @@ function changeStereoFormat(event) {
 			myStereoVideo2D.updateStereoMode("whole");
 		}
 
+		if (videoLoaded === true && videoStretch === 2.0) {
+			if (currentFormat === "Top-Bottom RL" || currentFormat === "Top-Bottom LR") {
+				videoWidth = parseInt(video.videoWidth / videoStretch, 10);
+				videoHeight = video.videoHeight;
+				console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
+				videoAspect = videoWidth / videoHeight;
+				resize();
+			}
+		}
+
 		currentFormat = "Side-by-Side RL";
 	}
 	else if (event.target.id === "stereoFormatSideBySideLR") {
@@ -384,6 +394,16 @@ function changeStereoFormat(event) {
 		else {
 			myStereoVideoWebGL.updateStereoMode("whole");
 			myStereoVideo2D.updateStereoMode("whole");
+		}
+
+		if (videoLoaded === true && videoStretch === 2.0) {
+			if (currentFormat === "Top-Bottom RL" || currentFormat === "Top-Bottom LR") {
+				videoWidth = parseInt(video.videoWidth / videoStretch, 10);
+				videoHeight = video.videoHeight;
+				console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
+				videoAspect = videoWidth / videoHeight;
+				resize();
+			}
 		}
 
 		currentFormat = "Side-by-Side LR";
@@ -415,6 +435,16 @@ function changeStereoFormat(event) {
 			myStereoVideo2D.updateStereoMode("whole");
 		}
 
+		if (videoLoaded === true && videoStretch === 2.0) {
+			if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
+				videoWidth = video.videoWidth;
+				videoHeight = parseInt(video.videoHeight / videoStretch, 10);
+				console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
+				videoAspect = videoWidth / videoHeight;
+				resize();
+			}
+		}
+
 		currentFormat = "Top-Bottom RL";
 	}
 	else if (event.target.id === "stereoFormatTopBottomLR") {
@@ -442,6 +472,16 @@ function changeStereoFormat(event) {
 		else {
 			myStereoVideoWebGL.updateStereoMode("whole");
 			myStereoVideo2D.updateStereoMode("whole");
+		}
+
+		if (videoLoaded === true && videoStretch === 2.0) {
+			if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
+				videoWidth = video.videoWidth;
+				videoHeight = parseInt(video.videoHeight / videoStretch, 10);
+				console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
+				videoAspect = videoWidth / videoHeight;
+				resize();
+			}
 		}
 
 		currentFormat = "Top-Bottom LR";
