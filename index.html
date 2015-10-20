@@ -6,6 +6,7 @@
 <script type="text/javascript" src="scripts/glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="scripts/stereoVideoWebGL.js"></script>
 <script type="text/javascript" src="scripts/stereoVideo2D.js"></script>
+<script type="text/javascript" src="scripts/loadAnimation.js"></script>
 <script type="text/javascript">
 var supportsWebGL;
 var videoCtxWebGL;
@@ -13,6 +14,7 @@ var videoCtx2D;
 var myStereoVideoWebGL;
 var myStereoVideo2D;
 var stereoVideo;
+var loadIcon;
 var videoTime;
 var videoAspect;
 var videoStretch;
@@ -45,6 +47,8 @@ function init() {
 		videoCanvasWebGL.style.display = "none";
 	}
 	stereoVideo = null;
+
+	loadIcon = new loadAnimation(loadingCanvas.getContext('2d'));
 
 	videoLoaded = false;
 	currentMode = "None";
@@ -584,6 +588,8 @@ function videoFileSelected(event) {
 				stereoModeAnaglyph.setAttribute("active", false);
 			}
 
+			startLoadAnimation();
+
 			videoLoaded = false;
 			loadWithAnonymousURL = false;
 			var videoURL = window.URL.createObjectURL(event.target.files[0]);
@@ -620,6 +626,8 @@ function videoUrlSelected(event) {
 			stereoModeAnaglyph.setAttribute("active", false);
 		}
 
+		startLoadAnimation();
+
 		videoLoaded = false;
 		loadWithAnonymousURL = true;
 		var videoURL = videoUrlDialogText.value;
@@ -647,6 +655,8 @@ function videoError(event) {
 		stereoModeAnaglyph.setAttribute("active", false);
 	}
 	else {
+		stopLoadAnimation();
+
 		videoErrorDialog.style.display = "block";
 	}
 }
@@ -675,6 +685,8 @@ function videoMetaData(event) {
 function videoCanPlayThrough(event) {
 	if (event.target.id === "video") {
 		if (videoLoaded === false) {
+			stopLoadAnimation();
+
 			videoLoaded = true;
 			stereoVideo.initTextures(video);
 			stereoVideo.draw();
@@ -683,6 +695,22 @@ function videoCanPlayThrough(event) {
 			animationReq = requestAnimationFrame(animateVideo);
 		}
 	}
+}
+
+function startLoadAnimation() {
+	loadAnimationReq = requestAnimationFrame(animateLoadIcon);
+	loadingCanvas.style.display = "block";
+}
+
+function stopLoadAnimation() {
+	if (loadAnimationReq !== null) cancelAnimationFrame(loadAnimationReq);
+	loadIcon.stop();
+	loadingCanvas.style.display = "none";
+}
+
+function animateLoadIcon(timestamp) {
+	loadIcon.draw(timestamp);
+	loadAnimationReq = requestAnimationFrame(animateLoadIcon);
 }
 
 function videoTimeUpdate(event) {
@@ -750,6 +778,7 @@ function httpGet(filename, callback) {
 <body onload="init()" onresize="resize()">
 	<canvas id="videoCanvasWebGL"></canvas>
 	<canvas id="videoCanvas2D"></canvas>
+	<canvas id="loadingCanvas" width="200" height="200"></canvas>
 	<div id="menu">
 		<table id="menuTable">
 			<tr>
