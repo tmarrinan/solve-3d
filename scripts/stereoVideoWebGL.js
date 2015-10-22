@@ -18,10 +18,14 @@ function stereoVideoWebGL(ctx) {
 
 	this.program = "whole";
 	this.shaderPrograms = {
-		"anaglyph-rl": null,
-		"anaglyph-lr": null,
-		"anaglyph-tb": null,
-		"anaglyph-bt": null,
+		"anaglyph_rc-rl": null,
+		"anaglyph_rc-lr": null,
+		"anaglyph_rc-tb": null,
+		"anaglyph_rc-bt": null,
+		"anaglyph_gm-rl": null,
+		"anaglyph_gm-lr": null,
+		"anaglyph_gm-tb": null,
+		"anaglyph_gm-bt": null,
 		"interleave-rl": null,
 		"interleave-lr": null,
 		"interleave-tb": null,

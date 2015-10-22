@@ -201,40 +201,92 @@ function showStereoModeOptions(event) {
 }
 
 function changeStereoMode(event) {
-	if (event.target.id === "stereoModeAnaglyph") {
+	var i;
+	var anaglyphRCImg1 = stereoModeAnaglyphRC.children[0];
+	var anaglyphRCImg2 = stereoModeAnaglyphRC.children[1];
+	var anaglyphGMImg1 = stereoModeAnaglyphGM.children[0];
+	var anaglyphGMImg2 = stereoModeAnaglyphGM.children[1];
+
+	if (event.target.id === "stereoModeAnaglyphRC") {
 		if (stereoVideo instanceof stereoVideo2D) return;
 
-		stereoModeAnaglyph.innerHTML = "&#x2713; Anaglyph";
+		stereoModeAnaglyphRC.innerHTML = "&#x2713; Anaglyph";
+		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
 		stereoModeNone.innerHTML = "&#x2751; None";
 
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg1);
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
+
 		if (currentFormat === "Side-by-Side RL") {
-			myStereoVideoWebGL.updateStereoMode("anaglyph-rl");
-			myStereoVideo2D.updateStereoMode("anaglyph-rl");
+			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-rl");
+			//myStereoVideo2D.updateStereoMode("anaglyph_rc-rl");
 		}
 		else if (currentFormat === "Side-by-Side LR") {
-			myStereoVideoWebGL.updateStereoMode("anaglyph-lr");
-			myStereoVideo2D.updateStereoMode("anaglyph-lr");
+			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-lr");
+			//myStereoVideo2D.updateStereoMode("anaglyph_rc-lr");
 		}
 		else if (currentFormat === "Top-Bottom RL") {
-			myStereoVideoWebGL.updateStereoMode("anaglyph-tb");
-			myStereoVideo2D.updateStereoMode("anaglyph-tb");
+			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-tb");
+			//myStereoVideo2D.updateStereoMode("anaglyph_rc-tb");
 		}
 		else {
-			myStereoVideoWebGL.updateStereoMode("anaglyph-bt");
-			myStereoVideo2D.updateStereoMode("anaglyph-bt");
+			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-bt");
+			//myStereoVideo2D.updateStereoMode("anaglyph_rc-bt");
 		}
 
-		currentMode = "anaglyph";
+		currentMode = "anaglyph_rc";
+	}
+	else if (event.target.id === "stereoModeAnaglyphGM") {
+		if (stereoVideo instanceof stereoVideo2D) return;
+
+		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphGM.innerHTML = "&#x2713; Anaglyph";
+		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
+		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
+		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
+		stereoModeNone.innerHTML = "&#x2751; None";
+		
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg1);
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
+
+		if (currentFormat === "Side-by-Side RL") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-rl");
+			//myStereoVideo2D.updateStereoMode("anaglyph_gm-rl");
+		}
+		else if (currentFormat === "Side-by-Side LR") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-lr");
+			//myStereoVideo2D.updateStereoMode("anaglyph_gm-lr");
+		}
+		else if (currentFormat === "Top-Bottom RL") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-tb");
+			//myStereoVideo2D.updateStereoMode("anaglyph_gm-tb");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-bt");
+			//myStereoVideo2D.updateStereoMode("anaglyph_gm-bt");
+		}
+
+		currentMode = "anaglyph_gm";
 	}
 	else if (event.target.id === "stereoModeInterleave") {
-		stereoModeAnaglyph.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2713; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
 		stereoModeNone.innerHTML = "&#x2751; None";
+
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg1);
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("interleave-rl");
@@ -256,11 +308,17 @@ function changeStereoMode(event) {
 		currentMode = "interleave";
 	}
 	else if (event.target.id === "stereoModeLeftEye") {
-		stereoModeAnaglyph.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2713; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
 		stereoModeNone.innerHTML = "&#x2751; None";
+
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg1);
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("right");
@@ -282,11 +340,17 @@ function changeStereoMode(event) {
 		currentMode = "leftEye";
 	}
 	else if (event.target.id === "stereoModeRightEye") {
-		stereoModeAnaglyph.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2713; Right Eye";
 		stereoModeNone.innerHTML = "&#x2751; None";
+
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg1);
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("left");
@@ -308,17 +372,25 @@ function changeStereoMode(event) {
 		currentMode = "rightEye";
 	}
 	else {
-		stereoModeAnaglyph.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
 		stereoModeNone.innerHTML = "&#x2713; None";
+
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg1);
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
 
 		myStereoVideoWebGL.updateStereoMode("whole");
 		myStereoVideo2D.updateStereoMode("whole");
 
 		currentMode = "None";
 	}
+
+	if (videoLoaded === true) stereoVideo.draw();
 }
 
 function showStereoFormatOptions(event) {
@@ -338,9 +410,13 @@ function changeStereoFormat(event) {
 		stereoFormatTopBottomRL.innerHTML = "&#x2751; Top-Bottom RL";
 		stereoFormatTopBottomLR.innerHTML = "&#x2751; Top-Bottom LR";
 
-		if (currentMode === "anaglyph") {
-			myStereoVideoWebGL.updateStereoMode("anaglyph-rl");
-			myStereoVideo2D.updateStereoMode("anaglyph-rl");
+		if (currentMode === "anaglyph_rc") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-rl");
+			//myStereoVideo2D.updateStereoMode("anaglyph_rc-rl");
+		}
+		else if (currentMode === "anaglyph_gm") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-rl");
+			//myStereoVideo2D.updateStereoMode("anaglyph_gm-rl");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-rl");
@@ -377,9 +453,13 @@ function changeStereoFormat(event) {
 		stereoFormatTopBottomRL.innerHTML = "&#x2751; Top-Bottom RL";
 		stereoFormatTopBottomLR.innerHTML = "&#x2751; Top-Bottom LR";
 
-		if (currentMode === "anaglyph") {
-			myStereoVideoWebGL.updateStereoMode("anaglyph-lr");
-			myStereoVideo2D.updateStereoMode("anaglyph-lr");
+		if (currentMode === "anaglyph_rc") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-lr");
+			//myStereoVideo2D.updateStereoMode("anaglyph_rc-lr");
+		}
+		else if (currentMode === "anaglyph_gm") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-lr");
+			//myStereoVideo2D.updateStereoMode("anaglyph_gm-lr");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-lr");
@@ -416,9 +496,13 @@ function changeStereoFormat(event) {
 		stereoFormatTopBottomRL.innerHTML = "&#x2713; Top-Bottom RL";
 		stereoFormatTopBottomLR.innerHTML = "&#x2751; Top-Bottom LR";
 
-		if (currentMode === "anaglyph") {
-			myStereoVideoWebGL.updateStereoMode("anaglyph-tb");
-			myStereoVideo2D.updateStereoMode("anaglyph-tb");
+		if (currentMode === "anaglyph_rc") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-tb");
+			//myStereoVideo2D.updateStereoMode("anaglyph_rc-tb");
+		}
+		else if (currentMode === "anaglyph_gm") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-tb");
+			//myStereoVideo2D.updateStereoMode("anaglyph_gm-tb");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-tb");
@@ -455,9 +539,13 @@ function changeStereoFormat(event) {
 		stereoFormatTopBottomRL.innerHTML = "&#x2751; Top-Bottom RL";
 		stereoFormatTopBottomLR.innerHTML = "&#x2713; Top-Bottom LR";
 
-		if (currentMode === "anaglyph") {
-			myStereoVideoWebGL.updateStereoMode("anaglyph-bt");
-			myStereoVideo2D.updateStereoMode("anaglyph-bt");
+		if (currentMode === "anaglyph_rc") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-bt");
+			//myStereoVideo2D.updateStereoMode("anaglyph_rc-bt");
+		}
+		else if (currentMode === "anaglyph_gm") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-bt");
+			//myStereoVideo2D.updateStereoMode("anaglyph_gm-bt");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-bt");
@@ -639,13 +727,15 @@ function videoFileSelected(event) {
 				stereoVideo = myStereoVideoWebGL;
 				videoCanvasWebGL.style.display = "block";
 				videoCanvas2D.style.display = "none";
-				stereoModeAnaglyph.setAttribute("active", true);
+				stereoModeAnaglyphRC.setAttribute("active", true);
+				stereoModeAnaglyphGM.setAttribute("active", true);
 			}
 			else {
 				stereoVideo = myStereoVideo2D;
 				videoCanvasWebGL.style.display = "none";
 				videoCanvas2D.style.display = "block";
-				stereoModeAnaglyph.setAttribute("active", false);
+				stereoModeAnaglyphRC.setAttribute("active", false);
+				stereoModeAnaglyphGM.setAttribute("active", false);
 			}
 
 			startLoadAnimation();
@@ -677,13 +767,15 @@ function videoUrlSelected(event) {
 			stereoVideo = myStereoVideoWebGL;
 			videoCanvasWebGL.style.display = "block";
 			videoCanvas2D.style.display = "none";
-			stereoModeAnaglyph.setAttribute("active", true);
+			stereoModeAnaglyphRC.setAttribute("active", true);
+			stereoModeAnaglyphGM.setAttribute("active", true);
 		}
 		else {
 			stereoVideo = myStereoVideo2D;
 			videoCanvasWebGL.style.display = "none";
 			videoCanvas2D.style.display = "block";
-			stereoModeAnaglyph.setAttribute("active", false);
+			stereoModeAnaglyphRC.setAttribute("active", false);
+			stereoModeAnaglyphGM.setAttribute("active", false);
 		}
 
 		startLoadAnimation();
@@ -712,7 +804,8 @@ function videoError(event) {
 		videoCanvasWebGL.style.display = "none";
 		videoCanvas2D.style.display = "block";
 		console.log("WARNING: Cross-Origin Video not supported in WebGL. Using 2D Canvas instead.");
-		stereoModeAnaglyph.setAttribute("active", false);
+		stereoModeAnaglyphRC.setAttribute("active", false);
+		stereoModeAnaglyphGM.setAttribute("active", false);
 	}
 	else {
 		stopLoadAnimation();
@@ -867,11 +960,12 @@ function httpGet(filename, callback) {
 	</div>
 	<div id="stereoModeOptions">
 		<ul id="stereoModeOptionsList">
-			<li id="stereoModeAnaglyph" class="videoMenuOptionsOdd">&#x2751; Anaglyph</li>
-			<li id="stereoModeInterleave" class="videoMenuOptionsEven">&#x2751; Interleave</li>
-			<li id="stereoModeLeftEye" class="videoMenuOptionsOdd">&#x2751; Left Eye</li>
-			<li id="stereoModeRightEye" class="videoMenuOptionsEven">&#x2751; Right Eye</li>
-			<li id="stereoModeNone" class="videoMenuOptionsOdd">&#x2713; None</li>
+			<li id="stereoModeAnaglyphRC" class="videoMenuOptionsOdd">&#x2751; Anaglyph<img id="anaglyphRedCyanImg1" class="active" src="images/red-cyan.png" width="14" height="14"><img id="anaglyphRedCyanImg2" class="inactive" src="images/red-cyan_inactive.png" width="14" height="14"></li>
+			<li id="stereoModeAnaglyphGM" class="videoMenuOptionsEven">&#x2751; Anaglyph<img id="anaglyphGreenMagentaImg1" class="active" src="images/green-magenta.png" width="14" height="14"><img id="anaglyphGreenMagentaImg2" class="inactive" src="images/green-magenta_inactive.png" width="14" height="14"></li>
+			<li id="stereoModeInterleave" class="videoMenuOptionsOdd">&#x2751; Interleave</li>
+			<li id="stereoModeLeftEye" class="videoMenuOptionsEven">&#x2751; Left Eye</li>
+			<li id="stereoModeRightEye" class="videoMenuOptionsOdd">&#x2751; Right Eye</li>
+			<li id="stereoModeNone" class="videoMenuOptionsEven">&#x2713; None</li>
 		</ul>
 	</div>
 	<div id="stereoFormatOptions">

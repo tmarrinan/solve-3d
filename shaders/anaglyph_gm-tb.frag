@@ -9,11 +9,11 @@ void main() {
 
 	vec3 rgbl = texture2D(rgb_image, thalf).rgb;
 	vec3 rgbr = texture2D(rgb_image, bhalf).rgb;
-	float g = rgbr.g + 0.45 * max(0.0, rgbr.r - rgbr.g);
-	float b = rgbr.b + 0.25 * max(0.0, rgbr.r - rgbr.b);
+	float g = rgbl.g + 0.45 * max(0.0, rgbl.r - rgbl.g);
+	float b = rgbl.b + 0.25 * max(0.0, rgbl.r - rgbl.b);
 	float r = g * 0.749 + b * 0.251;
-	g = rgbl.g + + 0.45 * max(0.0, rgbl.r - rgbl.g);
-	b = rgbl.b + + 0.25 * max(0.0, rgbl.r - rgbl.b);
+	g = rgbr.g + 0.45 * max(0.0, rgbr.r - rgbr.g);
+	b = rgbl.b + 0.25 * max(0.0, rgbl.r - rgbl.b);
 
 	gl_FragColor = vec4(clamp(r, 0.0, 1.0), clamp(g, 0.0, 1.0), clamp(b, 0.0, 1.0), 1.0);
 }
