@@ -109,6 +109,8 @@ function init() {
 	videoControlsSeek.addEventListener('mousedown', startVideoSeek, false);
 	videoControlsSeek.addEventListener('input', videoSeeking, false);
 	videoControlsSeek.addEventListener('mouseup', finishVideoSeek, false);
+	videoControlsLoop.addEventListener('click', noLoopVideo, false);
+	videoControlsNoLoop.addEventListener('click', loopVideo, false);
 	videoControlsFullScreen.addEventListener('click', fullScreenVideo, false);
 	
 	videoFile.addEventListener('change', videoFileSelected, false);
@@ -595,6 +597,22 @@ function finishVideoSeek(event) {
 	}
 }
 
+function loopVideo(event) {
+	if (videoLoaded === true) {
+		videoControlsLoop.style.display = "block";
+		videoControlsNoLoop.style.display = "none";
+		video.loop = true;
+	}
+}
+
+function noLoopVideo(event) {
+	if (videoLoaded === true) {
+		videoControlsLoop.style.display = "none";
+		videoControlsNoLoop.style.display = "block";
+		video.loop = false;
+	}
+}
+
 function fullScreenVideo(event) {
 	var fsElement = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
 	if (fsElement === document.body) {
@@ -875,6 +893,8 @@ function httpGet(filename, callback) {
 		<img id="videoControlsPause" src="images/pause_icon_glow.png" width="42" height="42">
 		<input id="videoControlsSeek" type="range" min="0" max="1000" step="1" value="0">
 		<span id="videoControlsTime">0:00:00</span>
+		<img id="videoControlsLoop" src="images/loop_icon_glow.png" width="42" height="42">
+		<img id="videoControlsNoLoop" src="images/noloop_icon_glow.png" width="42" height="42">
 		<img id="videoControlsFullScreen" src="images/fullscreen_icon_glow.png" width="42" height="42">
 	</div>
 

@@ -105,16 +105,31 @@ body {
 	position: absolute;
 	left: 80px; 
 	top: 26px;
-	width: 425px;
+	width: 359px;
 }
 
 #videoControlsTime {
 	position: absolute;
-	right: 95px;
+	right: 161px;
 	top: 29px;
 	color: #FFFFFF;
 	text-shadow: 0 0 3px #B3ECF5;
 	font-size: 12px;
+}
+
+#videoControlsLoop {
+	position: absolute;
+	right: 84px; 
+	top: 16px;
+	cursor: pointer;
+	display: none;
+}
+
+#videoControlsNoLoop {
+	position: absolute;
+	right: 84px; 
+	top: 16px;
+	cursor: pointer;
 }
 
 #videoControlsFullScreen {
