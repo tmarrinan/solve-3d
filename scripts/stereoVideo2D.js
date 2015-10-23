@@ -20,11 +20,36 @@ stereoVideo2D.prototype.updateTextures = function(videoElement) {
 
 stereoVideo2D.prototype.updateStereoMode = function(mode) {
 	this.stereoMode = mode;
-	if (this.video !== null) this.draw();
 };
 
 stereoVideo2D.prototype.draw = function() {
+	if (this.video === null) return;
+
 	switch (this.stereoMode) {
+		case "anaglyph_rc-rl":
+			this.drawAnaglyphRCRL();
+			break;
+		case "anaglyph_rc-lr":
+			this.drawAnaglyphRCLR();
+			break;
+		case "anaglyph_rc-tb":
+			this.drawAnaglyphRCTB();
+			break;
+		case "anaglyph_rc-bt":
+			this.drawAnaglyphRCBT();
+			break;
+		case "anaglyph_gm-rl":
+			this.drawAnaglyphGMRL();
+			break;
+		case "anaglyph_gm-lr":
+			this.drawAnaglyphGMLR();
+			break;
+		case "anaglyph_gm-tb":
+			this.drawAnaglyphGMTB();
+			break;
+		case "anaglyph_gm-bt":
+			this.drawAnaglyphGMBT();
+			break;
 		case "interleave-rl":
 			this.drawInterleaveRL();
 			break;
@@ -55,6 +80,54 @@ stereoVideo2D.prototype.draw = function() {
 	}
 };
 
+stereoVideo2D.prototype.processAnaglyph = function(leftEye, rightEye, colormode) {
+	var idr, idg, idb;
+	var r, g, b;
+	var x = 0;
+	var y = rightEye.width * rightEye.height;
+	var index = 0;
+
+	var tmpCanvas = document.createElement('canvas');
+	var tmpCtx = tmpCanvas.getContext('2d');
+	tmpCanvas.width  = nativeWidth;
+	tmpCanvas.height = nativeHeight;
+
+	tmpCtx.drawImage(this.video, 0, 0, nativeWidth, nativeHeight);
+	var iData1 = tmpCtx.getImageData(rightEye.x, rightEye.y, rightEye.width, rightEye.height);
+	var iData2 = tmpCtx.getImageData(leftEye.x, leftEye.y, leftEye.width, leftEye.height);
+	var oData = tmpCtx.createImageData(rightEye.width, rightEye.height);
+
+	if (colormode === "red-cyan") {
+		idr = iData1;
+		idg = iData2;
+		idb = iData2;
+	}
+	else if (colormode === "green-magenta") {
+		idr = iData2;
+		idg = iData1;
+		idb = iData2;
+	}
+
+	for (x=0; x<y; x++) {
+		g = idr.data[index + 1] + 0.45 * Math.max(0, idr.data[index + 0] - idr.data[index + 1]);
+		b = idr.data[index + 2] + 0.25 * Math.max(0, idr.data[index + 0] - idr.data[index + 2]);
+		r = g * 0.749 + b * 0.251;
+		g = idg.data[index + 1] + 0.45 * Math.max(0, idg.data[index + 0] - idg.data[index + 1]);
+		b = idb.data[index + 2] + 0.25 * Math.max(0, idb.data[index + 0] - idb.data[index + 2]);
+		r = Math.min(Math.max(r, 0), 255);
+		g = Math.min(Math.max(g, 0), 255);
+		b = Math.min(Math.max(b, 0), 255);
+		oData.data[index++] = r;
+		oData.data[index++] = g;
+		oData.data[index++] = b;
+		oData.data[index++] = 255;
+	}
+
+	tmpCtx.putImageData(oData, 0, 0);
+
+	this.ctx.drawImage(tmpCanvas, 0, 0, rightEye.width, rightEye.height, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+}
+
 stereoVideo2D.prototype.processInterleave = function(leftEye, rightEye) {
 	// draw right eye
 	this.ctx.drawImage(this.video, rightEye.x , rightEye.y, rightEye.width, rightEye.height, 0 , 0, this.ctx.canvas.width, this.ctx.canvas.height);
@@ -80,60 +153,132 @@ stereoVideo2D.prototype.processInterleave = function(leftEye, rightEye) {
 	this.ctx.restore();
 };
 
-stereoVideo2D.prototype.drawInterleaveRL = function() {
-	var halfWidth = parseInt(this.video.videoWidth / 2, 10);
+stereoVideo2D.prototype.drawAnaglyphRCRL = function() {
+	var halfWidth = parseInt(nativeWidth / 2, 10);
 
-	var leftEye = {x: halfWidth, y: 0, width: halfWidth, height: this.video.videoHeight};
-	var rightEye = {x: 0, y: 0, width: halfWidth, height: this.video.videoHeight};
+	var leftEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
+	var rightEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
+	
+	this.processAnaglyph(leftEye, rightEye, "red-cyan");
+}
+
+stereoVideo2D.prototype.drawAnaglyphRCLR = function() {
+	var halfWidth = parseInt(nativeWidth / 2, 10);
+
+	var leftEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
+	var rightEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
+	
+	this.processAnaglyph(leftEye, rightEye, "red-cyan");
+}
+
+stereoVideo2D.prototype.drawAnaglyphRCTB = function() {
+	var halfHeight = parseInt(nativeHeight / 2, 10);
+
+	var leftEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
+	var rightEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
+	
+	this.processAnaglyph(leftEye, rightEye, "red-cyan");
+}
+
+stereoVideo2D.prototype.drawAnaglyphRCBT = function() {
+	var halfHeight = parseInt(nativeHeight / 2, 10);
+
+	var leftEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
+	var rightEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
+	
+	this.processAnaglyph(leftEye, rightEye, "red-cyan");
+}
+
+stereoVideo2D.prototype.drawAnaglyphGMRL = function() {
+	var halfWidth = parseInt(nativeWidth / 2, 10);
+
+	var leftEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
+	var rightEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
+	
+	this.processAnaglyph(leftEye, rightEye, "green-magenta");
+}
+
+stereoVideo2D.prototype.drawAnaglyphGMLR = function() {
+	var halfWidth = parseInt(nativeWidth / 2, 10);
+
+	var leftEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
+	var rightEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
+	
+	this.processAnaglyph(leftEye, rightEye, "green-magenta");
+}
+
+stereoVideo2D.prototype.drawAnaglyphGMTB = function() {
+	var halfHeight = parseInt(nativeHeight / 2, 10);
+
+	var leftEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
+	var rightEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
+	
+	this.processAnaglyph(leftEye, rightEye, "green-magenta");
+}
+
+stereoVideo2D.prototype.drawAnaglyphGMBT = function() {
+	var halfHeight = parseInt(nativeHeight / 2, 10);
+
+	var leftEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
+	var rightEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
+	
+	this.processAnaglyph(leftEye, rightEye, "green-magenta");
+}
+
+stereoVideo2D.prototype.drawInterleaveRL = function() {
+	var halfWidth = parseInt(nativeWidth / 2, 10);
+
+	var leftEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
+	var rightEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
 	
 	this.processInterleave(leftEye, rightEye);
 };
 
 stereoVideo2D.prototype.drawInterleaveLR = function() {
-	var halfWidth = parseInt(this.video.videoWidth / 2, 10);
+	var halfWidth = parseInt(nativeWidth / 2, 10);
 
-	var leftEye = {x: 0, y: 0, width: halfWidth, height: this.video.videoHeight};
-	var rightEye = {x: halfWidth, y: 0, width: halfWidth, height: this.video.videoHeight};
+	var leftEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
+	var rightEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
 	
 	this.processInterleave(leftEye, rightEye);
 };
 
 stereoVideo2D.prototype.drawInterleaveTB = function() {
-	var halfHeight = parseInt(this.video.videoHeight / 2, 10);
+	var halfHeight = parseInt(nativeHeight / 2, 10);
 
-	var leftEye = {x: 0, y: 0, width: this.video.videoWidth, height: halfHeight};
-	var rightEye = {x: 0, y: halfHeight, width: this.video.videoWidth, height: halfHeight};
+	var leftEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
+	var rightEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
 	
 	this.processInterleave(leftEye, rightEye);
 };
 
 stereoVideo2D.prototype.drawInterleaveBT = function() {
-	var halfHeight = parseInt(this.video.videoHeight / 2, 10);
+	var halfHeight = parseInt(nativeHeight / 2, 10);
 
-	var leftEye = {x: 0, y: halfHeight, width: this.video.videoWidth, height: halfHeight};
-	var rightEye = {x: 0, y: 0, width: this.video.videoWidth, height: halfHeight};
+	var leftEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
+	var rightEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
 	
 	this.processInterleave(leftEye, rightEye);
 };
 
 stereoVideo2D.prototype.drawLeftHalf = function() {
-	var halfWidth = parseInt(this.video.videoWidth / 2, 10);
-	this.ctx.drawImage(this.video, 0 , 0, halfWidth, this.video.videoHeight, 0 , 0, this.ctx.canvas.width, this.ctx.canvas.height);
+	var halfWidth = parseInt(nativeWidth / 2, 10);
+	this.ctx.drawImage(this.video, 0 , 0, halfWidth, nativeHeight, 0 , 0, this.ctx.canvas.width, this.ctx.canvas.height);
 };
 
 stereoVideo2D.prototype.drawRightHalf = function() {
-	var halfWidth = parseInt(this.video.videoWidth / 2, 10);
-	this.ctx.drawImage(this.video, halfWidth , 0, halfWidth, this.video.videoHeight, 0 , 0, this.ctx.canvas.width, this.ctx.canvas.height);
+	var halfWidth = parseInt(nativeWidth / 2, 10);
+	this.ctx.drawImage(this.video, halfWidth , 0, halfWidth, nativeHeight, 0 , 0, this.ctx.canvas.width, this.ctx.canvas.height);
 };
 
 stereoVideo2D.prototype.drawTopHalf = function() {
-	var halfHeight = parseInt(this.video.videoHeight / 2, 10);
-	this.ctx.drawImage(this.video, 0 , 0, this.video.videoWidth, halfHeight, 0 , 0, this.ctx.canvas.width, this.ctx.canvas.height);
+	var halfHeight = parseInt(nativeHeight / 2, 10);
+	this.ctx.drawImage(this.video, 0 , 0, nativeWidth, halfHeight, 0 , 0, this.ctx.canvas.width, this.ctx.canvas.height);
 };
 
 stereoVideo2D.prototype.drawBottomHalf = function() {
-	var halfHeight = parseInt(this.video.videoHeight / 2, 10);
-	this.ctx.drawImage(this.video, 0 , halfHeight, this.video.videoWidth, halfHeight, 0 , 0, this.ctx.canvas.width, this.ctx.canvas.height);
+	var halfHeight = parseInt(nativeHeight / 2, 10);
+	this.ctx.drawImage(this.video, 0 , halfHeight, nativeWidth, halfHeight, 0 , 0, this.ctx.canvas.width, this.ctx.canvas.height);
 };
 
 stereoVideo2D.prototype.drawWholeVideo = function() {

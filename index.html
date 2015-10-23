@@ -123,6 +123,7 @@ function init() {
 	video.addEventListener('canplaythrough', videoCanPlayThrough, false);
 	video.addEventListener('timeupdate', videoTimeUpdate, false);
 	img.addEventListener('load', imageLoaded, false);
+	img.addEventListener('error', imageError, false);
 
 	resize();
 }
@@ -211,7 +212,7 @@ function changeStereoMode(event) {
 	var anaglyphGMImg2 = stereoModeAnaglyphGM.children[1];
 
 	if (event.target.id === "stereoModeAnaglyphRC") {
-		if (stereoVideo instanceof stereoVideo2D) return;
+		if (stereoModeAnaglyphRC.getAttribute("active") === false || stereoModeAnaglyphRC.getAttribute("active") === "false") return;
 
 		stereoModeAnaglyphRC.innerHTML = "&#x2713; Anaglyph";
 		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
@@ -227,25 +228,25 @@ function changeStereoMode(event) {
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-rl");
-			//myStereoVideo2D.updateStereoMode("anaglyph_rc-rl");
+			myStereoVideo2D.updateStereoMode("anaglyph_rc-rl");
 		}
 		else if (currentFormat === "Side-by-Side LR") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-lr");
-			//myStereoVideo2D.updateStereoMode("anaglyph_rc-lr");
+			myStereoVideo2D.updateStereoMode("anaglyph_rc-lr");
 		}
 		else if (currentFormat === "Top-Bottom RL") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-tb");
-			//myStereoVideo2D.updateStereoMode("anaglyph_rc-tb");
+			myStereoVideo2D.updateStereoMode("anaglyph_rc-tb");
 		}
 		else {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-bt");
-			//myStereoVideo2D.updateStereoMode("anaglyph_rc-bt");
+			myStereoVideo2D.updateStereoMode("anaglyph_rc-bt");
 		}
 
 		currentMode = "anaglyph_rc";
 	}
 	else if (event.target.id === "stereoModeAnaglyphGM") {
-		if (stereoVideo instanceof stereoVideo2D) return;
+		if (stereoModeAnaglyphGM.getAttribute("active") === false || stereoModeAnaglyphGM.getAttribute("active") === "false") return;
 
 		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
 		stereoModeAnaglyphGM.innerHTML = "&#x2713; Anaglyph";
@@ -261,19 +262,19 @@ function changeStereoMode(event) {
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-rl");
-			//myStereoVideo2D.updateStereoMode("anaglyph_gm-rl");
+			myStereoVideo2D.updateStereoMode("anaglyph_gm-rl");
 		}
 		else if (currentFormat === "Side-by-Side LR") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-lr");
-			//myStereoVideo2D.updateStereoMode("anaglyph_gm-lr");
+			myStereoVideo2D.updateStereoMode("anaglyph_gm-lr");
 		}
 		else if (currentFormat === "Top-Bottom RL") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-tb");
-			//myStereoVideo2D.updateStereoMode("anaglyph_gm-tb");
+			myStereoVideo2D.updateStereoMode("anaglyph_gm-tb");
 		}
 		else {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-bt");
-			//myStereoVideo2D.updateStereoMode("anaglyph_gm-bt");
+			myStereoVideo2D.updateStereoMode("anaglyph_gm-bt");
 		}
 
 		currentMode = "anaglyph_gm";
@@ -415,11 +416,11 @@ function changeStereoFormat(event) {
 
 		if (currentMode === "anaglyph_rc") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-rl");
-			//myStereoVideo2D.updateStereoMode("anaglyph_rc-rl");
+			myStereoVideo2D.updateStereoMode("anaglyph_rc-rl");
 		}
 		else if (currentMode === "anaglyph_gm") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-rl");
-			//myStereoVideo2D.updateStereoMode("anaglyph_gm-rl");
+			myStereoVideo2D.updateStereoMode("anaglyph_gm-rl");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-rl");
@@ -458,11 +459,11 @@ function changeStereoFormat(event) {
 
 		if (currentMode === "anaglyph_rc") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-lr");
-			//myStereoVideo2D.updateStereoMode("anaglyph_rc-lr");
+			myStereoVideo2D.updateStereoMode("anaglyph_rc-lr");
 		}
 		else if (currentMode === "anaglyph_gm") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-lr");
-			//myStereoVideo2D.updateStereoMode("anaglyph_gm-lr");
+			myStereoVideo2D.updateStereoMode("anaglyph_gm-lr");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-lr");
@@ -501,11 +502,11 @@ function changeStereoFormat(event) {
 
 		if (currentMode === "anaglyph_rc") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-tb");
-			//myStereoVideo2D.updateStereoMode("anaglyph_rc-tb");
+			myStereoVideo2D.updateStereoMode("anaglyph_rc-tb");
 		}
 		else if (currentMode === "anaglyph_gm") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-tb");
-			//myStereoVideo2D.updateStereoMode("anaglyph_gm-tb");
+			myStereoVideo2D.updateStereoMode("anaglyph_gm-tb");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-tb");
@@ -544,11 +545,11 @@ function changeStereoFormat(event) {
 
 		if (currentMode === "anaglyph_rc") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-bt");
-			//myStereoVideo2D.updateStereoMode("anaglyph_rc-bt");
+			myStereoVideo2D.updateStereoMode("anaglyph_rc-bt");
 		}
 		else if (currentMode === "anaglyph_gm") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-bt");
-			//myStereoVideo2D.updateStereoMode("anaglyph_gm-bt");
+			myStereoVideo2D.updateStereoMode("anaglyph_gm-bt");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-bt");
@@ -736,29 +737,35 @@ function videoFileSelected(event) {
 				animationReq = null;
 			}
 
-			if (supportsWebGL === true) {
-				stereoVideo = myStereoVideoWebGL;
-				videoCanvasWebGL.style.display = "block";
-				videoCanvas2D.style.display = "none";
-				stereoModeAnaglyphRC.setAttribute("active", true);
-				stereoModeAnaglyphGM.setAttribute("active", true);
+			videoLoaded = false;
+			startLoadAnimation();
+
+			if (videoTypes.indexOf(event.target.files[0].type) >= 0) {
+				if (supportsWebGL === true) {
+					stereoVideo = myStereoVideoWebGL;
+					videoCanvasWebGL.style.display = "block";
+					videoCanvas2D.style.display = "none";
+					stereoModeAnaglyphRC.setAttribute("active", true);
+					stereoModeAnaglyphGM.setAttribute("active", true);
+				}
+				else {
+					stereoVideo = myStereoVideo2D;
+					videoCanvasWebGL.style.display = "none";
+					videoCanvas2D.style.display = "block";
+					stereoModeAnaglyphRC.setAttribute("active", false);
+					stereoModeAnaglyphGM.setAttribute("active", false);
+				}
+
+				loadWithAnonymousURL = false;
+				video.src = window.URL.createObjectURL(event.target.files[0]);
 			}
 			else {
 				stereoVideo = myStereoVideo2D;
 				videoCanvasWebGL.style.display = "none";
 				videoCanvas2D.style.display = "block";
-				stereoModeAnaglyphRC.setAttribute("active", false);
-				stereoModeAnaglyphGM.setAttribute("active", false);
-			}
+				stereoModeAnaglyphRC.setAttribute("active", true);
+				stereoModeAnaglyphGM.setAttribute("active", true);
 
-			videoLoaded = false;
-			startLoadAnimation();
-
-			if (videoTypes.indexOf(event.target.files[0].type) >= 0) {
-				loadWithAnonymousURL = false;
-				video.src = window.URL.createObjectURL(event.target.files[0]);;
-			}
-			else {
 				if (video.paused !== true) video.pause();
 				img.src = window.URL.createObjectURL(event.target.files[0]);
 			}
@@ -781,28 +788,45 @@ function videoUrlSelected(event) {
 			animationReq = null;
 		}
 
-		if (supportsWebGL === true) {
-			stereoVideo = myStereoVideoWebGL;
-			videoCanvasWebGL.style.display = "block";
-			videoCanvas2D.style.display = "none";
-			stereoModeAnaglyphRC.setAttribute("active", true);
-			stereoModeAnaglyphGM.setAttribute("active", true);
-		}
-		else {
+		videoLoaded = false;
+		startLoadAnimation();
+
+		var extE = videoUrlDialogText.value.indexOf("?");
+		if (extE < 0) extE = videoUrlDialogText.value.length;
+		var extS = videoUrlDialogText.value.substring(0, extE).lastIndexOf(".");
+		var ext = videoUrlDialogText.value.substring(extS, extE);
+		if (ext === ".jpeg" || ext === ".jpg" || ext === ".png" || ext === ".jps" || ext === ".pns") {
 			stereoVideo = myStereoVideo2D;
 			videoCanvasWebGL.style.display = "none";
 			videoCanvas2D.style.display = "block";
-			stereoModeAnaglyphRC.setAttribute("active", false);
-			stereoModeAnaglyphGM.setAttribute("active", false);
+			stereoModeAnaglyphRC.setAttribute("active", true);
+			stereoModeAnaglyphGM.setAttribute("active", true);
+
+			if (video.paused !== true) video.pause();
+			loadWithAnonymousURL = true;
+			img.crossOrigin = "anonymous";
+			img.src = videoUrlDialogText.value;
 		}
+		else {
+			if (supportsWebGL === true) {
+				stereoVideo = myStereoVideoWebGL;
+				videoCanvasWebGL.style.display = "block";
+				videoCanvas2D.style.display = "none";
+				stereoModeAnaglyphRC.setAttribute("active", true);
+				stereoModeAnaglyphGM.setAttribute("active", true);
+			}
+			else {
+				stereoVideo = myStereoVideo2D;
+				videoCanvasWebGL.style.display = "none";
+				videoCanvas2D.style.display = "block";
+				stereoModeAnaglyphRC.setAttribute("active", false);
+				stereoModeAnaglyphGM.setAttribute("active", false);
+			}
 
-		startLoadAnimation();
-
-		videoLoaded = false;
-		loadWithAnonymousURL = true;
-		var videoURL = videoUrlDialogText.value;
-		video.crossOrigin = "anonymous";
-		video.src = videoURL;
+			loadWithAnonymousURL = true;
+			video.crossOrigin = "anonymous";
+			video.src = videoUrlDialogText.value;;
+		}
 	}
 	videoUrlDialog.style.display = "none";
 }
@@ -893,6 +917,26 @@ function imageLoaded(event) {
 
 		stereoVideo.initTextures(img);
 		stereoVideo.draw();
+	}
+}
+
+function imageError(event) {
+	if (loadWithAnonymousURL === true) {
+		img.removeAttribute("crossOrigin");
+		img.src = videoUrlDialogText.value;
+		loadWithAnonymousURL = false;
+
+		stereoVideo = myStereoVideo2D;
+		videoCanvasWebGL.style.display = "none";
+		videoCanvas2D.style.display = "block";
+		console.log("WARNING: Cross-Origin Video not supported in WebGL. Using 2D Canvas instead.");
+		stereoModeAnaglyphRC.setAttribute("active", false);
+		stereoModeAnaglyphGM.setAttribute("active", false);
+	}
+	else {
+		stopLoadAnimation();
+
+		videoErrorDialog.style.display = "block";
 	}
 }
 
@@ -1046,7 +1090,7 @@ function httpGet(url, callback) {
 
 	<div id="videoErrorDialog">
 		<p id="videoErrorDialogError">Error: video could not be loaded.</p>
-		<p id="videoErrorDialogExplanation">Ensure that you have selected a valid .mp4 or .webm file.</p>
+		<p id="videoErrorDialogExplanation">Ensure that you have selected a valid video or image file.</p>
 		<p id="videoErrorDialogNote">*Note: URLs from certain domains are not able to be loaded.</p>
 		<div id="videoErrorDialogCloseBtn">OK</div>
 	</div>
