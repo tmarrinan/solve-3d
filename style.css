@@ -285,6 +285,10 @@ body {
 	display: none;
 }
 
+#img {
+	display: none;
+}
+
 #videoFile {
 	display: none;
 }

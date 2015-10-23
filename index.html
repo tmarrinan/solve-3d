@@ -28,6 +28,8 @@ var animationReq;
 var animationTimeout;
 var loadWithAnonymousURL;
 var loadAnimationReq;
+var nativeWidth;
+var nativeHeight;
 
 function init() {
 	document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
@@ -120,6 +122,7 @@ function init() {
 	video.addEventListener('loadedmetadata', videoMetaData, false);
 	video.addEventListener('canplaythrough', videoCanPlayThrough, false);
 	video.addEventListener('timeupdate', videoTimeUpdate, false);
+	img.addEventListener('load', imageLoaded, false);
 
 	resize();
 }
@@ -437,8 +440,8 @@ function changeStereoFormat(event) {
 
 		if (videoLoaded === true && videoStretch === 2.0) {
 			if (currentFormat === "Top-Bottom RL" || currentFormat === "Top-Bottom LR") {
-				videoWidth = parseInt(video.videoWidth / videoStretch, 10);
-				videoHeight = video.videoHeight;
+				videoWidth = parseInt(nativeWidth / videoStretch, 10);
+				videoHeight = nativeHeight;
 				console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
 				videoAspect = videoWidth / videoHeight;
 				resize();
@@ -480,8 +483,8 @@ function changeStereoFormat(event) {
 
 		if (videoLoaded === true && videoStretch === 2.0) {
 			if (currentFormat === "Top-Bottom RL" || currentFormat === "Top-Bottom LR") {
-				videoWidth = parseInt(video.videoWidth / videoStretch, 10);
-				videoHeight = video.videoHeight;
+				videoWidth = parseInt(nativeWidth / videoStretch, 10);
+				videoHeight = nativeHeight;
 				console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
 				videoAspect = videoWidth / videoHeight;
 				resize();
@@ -523,8 +526,8 @@ function changeStereoFormat(event) {
 
 		if (videoLoaded === true && videoStretch === 2.0) {
 			if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
-				videoWidth = video.videoWidth;
-				videoHeight = parseInt(video.videoHeight / videoStretch, 10);
+				videoWidth = nativeWidth;
+				videoHeight = parseInt(nativeHeight / videoStretch, 10);
 				console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
 				videoAspect = videoWidth / videoHeight;
 				resize();
@@ -566,8 +569,8 @@ function changeStereoFormat(event) {
 
 		if (videoLoaded === true && videoStretch === 2.0) {
 			if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
-				videoWidth = video.videoWidth;
-				videoHeight = parseInt(video.videoHeight / videoStretch, 10);
+				videoWidth = nativeWidth;
+				videoHeight = parseInt(nativeHeight / videoStretch, 10);
 				console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
 				videoAspect = videoWidth / videoHeight;
 				resize();
@@ -585,12 +588,12 @@ function changeStereoFormat(event) {
 
 		if (videoLoaded === true) {
 			if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
-				videoWidth = parseInt(video.videoWidth / videoStretch, 10);
-				videoHeight = video.videoHeight;
+				videoWidth = parseInt(nativeWidth / videoStretch, 10);
+				videoHeight = nativeHeight;
 			}
 			else {
-				videoWidth = video.videoWidth;
-				videoHeight = parseInt(video.videoHeight / videoStretch, 10);
+				videoWidth = nativeWidth;
+				videoHeight = parseInt(nativeHeight / videoStretch, 10);
 			}
 			console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
 			videoAspect = videoWidth / videoHeight;
@@ -605,12 +608,12 @@ function changeStereoFormat(event) {
 
 		if (videoLoaded === true) {
 			if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
-				videoWidth = parseInt(video.videoWidth / videoStretch, 10);
-				videoHeight = video.videoHeight;
+				videoWidth = parseInt(nativeWidth / videoStretch, 10);
+				videoHeight = nativeHeight;
 			}
 			else {
-				videoWidth = video.videoWidth;
-				videoHeight = parseInt(video.videoHeight / videoStretch, 10);
+				videoWidth = nativeWidth;
+				videoHeight = parseInt(nativeHeight / videoStretch, 10);
 			}
 			console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
 			videoAspect = videoWidth / videoHeight;
@@ -713,7 +716,17 @@ function fullScreenVideo(event) {
 
 function videoFileSelected(event) {
 	if (event.target.files.length > 0) {
-		if (event.target.files[0].type === "video/mp4" || event.target.files[0].type === "video/webm") {
+		var ext = event.target.files[0].name.substring(event.target.files[0].name.lastIndexOf("."), event.target.files[0].name.length);
+		var videoTypes = [
+			"video/mp4",
+			"video/webm"
+		];
+		var imageTypes = [
+			"image/jpeg",
+			"image/png"
+		];
+
+		if (videoTypes.indexOf(event.target.files[0].type) >= 0 || imageTypes.indexOf(event.target.files[0].type) >= 0 || ext === ".jps" || ext === ".pns") {
 			if (animationTimeout !== null) {
 				clearTimeout(animationTimeout);
 				animationTimeout = null;
@@ -738,12 +751,17 @@ function videoFileSelected(event) {
 				stereoModeAnaglyphGM.setAttribute("active", false);
 			}
 
+			videoLoaded = false;
 			startLoadAnimation();
 
-			videoLoaded = false;
-			loadWithAnonymousURL = false;
-			var videoURL = window.URL.createObjectURL(event.target.files[0]);
-			video.src = videoURL;
+			if (videoTypes.indexOf(event.target.files[0].type) >= 0) {
+				loadWithAnonymousURL = false;
+				video.src = window.URL.createObjectURL(event.target.files[0]);;
+			}
+			else {
+				if (video.paused !== true) video.pause();
+				img.src = window.URL.createObjectURL(event.target.files[0]);
+			}
 		}
 		else {
 			loadWithAnonymousURL = false;
@@ -786,7 +804,6 @@ function videoUrlSelected(event) {
 		video.crossOrigin = "anonymous";
 		video.src = videoURL;
 	}
-	
 	videoUrlDialog.style.display = "none";
 }
 
@@ -816,16 +833,18 @@ function videoError(event) {
 
 function videoMetaData(event) {
 	if (event.target.id === "video") {
-		console.log("Full video size: " + event.target.videoWidth + "x" + event.target.videoHeight);
+		nativeWidth = event.target.videoWidth;
+		nativeHeight = event.target.videoHeight;
+		console.log("Full video size: " + nativeWidth + "x" + nativeHeight);
 		var videoWidth;
 		var videoHeight;
 		if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
-			videoWidth = parseInt(event.target.videoWidth / videoStretch, 10);
-			videoHeight = event.target.videoHeight;
+			videoWidth = parseInt(nativeWidth / videoStretch, 10);
+			videoHeight = nativeHeight;
 		}
 		else {
-			videoWidth = event.target.videoWidth;
-			videoHeight = parseInt(event.target.videoHeight / videoStretch, 10);
+			videoWidth = nativeWidth;
+			videoHeight = parseInt(nativeHeight / videoStretch, 10);
 		}
 		console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
 		videoAspect = videoWidth / videoHeight;
@@ -839,14 +858,41 @@ function videoCanPlayThrough(event) {
 	if (event.target.id === "video") {
 		if (videoLoaded === false) {
 			stopLoadAnimation();
-
 			videoLoaded = true;
 			stereoVideo.initTextures(video);
 			stereoVideo.draw();
 			playVideo(event);
+			
+		}		
+	}
+}
 
-			animationReq = requestAnimationFrame(animateVideo);
+function imageLoaded(event) {
+	if (event.target.id === "img") {
+		videoLoaded = true;
+		stopLoadAnimation();
+
+		nativeWidth = img.naturalWidth;
+		nativeHeight = img.naturalHeight;
+		console.log("Full video size: " + nativeWidth + "x" + nativeHeight);
+		var imgWidth;
+		var imgHeight;
+		if (currentFormat === "Side-by-Side RL" || currentFormat === "Side-by-Side LR") {
+			imgWidth = parseInt(nativeWidth / videoStretch, 10);
+			imgHeight = nativeHeight;
 		}
+		else {
+			imgWidth = nativeWidth;
+			imgHeight = parseInt(nativeHeight / videoStretch, 10);
+		}
+		console.log("Rendered video size: " + imgWidth + "x" + imgHeight);
+		videoAspect = imgWidth / imgHeight;
+		videoControls.style.display = "none";
+		changeStereoMode({target: {id: "stereoModeNone"}});
+		resize();
+
+		stereoVideo.initTextures(img);
+		stereoVideo.draw();
 	}
 }
 
@@ -911,9 +957,9 @@ function allNonNullDict(dict) {
 	return true;
 }
 
-function httpGet(filename, callback) {
+function httpGet(url, callback) {
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", filename, true);
+	xhr.open("GET", url, true);
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState === 4) {
 			if (xhr.status === 200) {
@@ -1006,6 +1052,7 @@ function httpGet(filename, callback) {
 	</div>
 
 	<input id="videoFile" type="file" name="videoFile">
-	<video id="video" controls="controls"></video>
+	<video id="video"></video>
+	<img id="img"></img>
 </body>
 </html>
