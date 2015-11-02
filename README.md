@@ -4,7 +4,7 @@
 
 #### Usage
 
-Video player for .mp4 or .webm stereoscopic 3D videos. Supports playing local files or from URL.
+Video player for MP4 (.mp4) or WEBM (.webm) stereoscopic 3D videos. Also can be used to view JPEG (.jpg, .jps) and PNG (.png, .pns) stereoscopic 3D images. Supports local files or from URL.
 
 Supported formats:
  * Side-by-side (right eye, left eye)
@@ -29,4 +29,4 @@ Rendering
 
 #### Live Site
 
-Use without downloading by visiting [http://www.mcs.anl.gov/~marrinan/solve-3d/](http://www.mcs.anl.gov/~marrinan/solve-3d/)
+Use without downloading by visiting [http://web.alcf.anl.gov/~marrinan/solve-3d/](http://web.alcf.anl.gov/~marrinan/solve-3d/)
