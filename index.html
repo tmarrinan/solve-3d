@@ -129,14 +129,15 @@ function init() {
 
 	resize();
 
-	var reqVid = getParameterByName("video");
-	if (reqVid !== "") {
-		var reqMode = getParameterByName("mode");
-		if (reqMode === "") reqMode = "anaglyph_rc";
-		var reqFormat = getParameterByName("format");
-		if (reqFormat === "") reqFormat = "side-by-side_rl";
-		var reqRes = getParameterByName("resolution");
-		if (reqRes === "") reqRes = "native";
+	var params = getSearchParameters();
+	var reqVid = params["video"];
+	if (reqVid !== undefined) {
+		var reqMode = params["mode"];
+		if (reqMode === undefined) reqMode = "anaglyph_rc";
+		var reqFormat = params["format"];
+		if (reqFormat === undefined) reqFormat = "side-by-side_rl";
+		var reqRes = params["resolution"];
+		if (reqRes === undefined) reqRes = "native";
 
 		initializeVideoNoUI(reqVid, reqMode, reqFormat, reqRes);
 	}
@@ -421,8 +422,6 @@ function showStereoFormatOptions(event) {
 function changeStereoFormat(event) {
 	var videoWidth;
 	var videoHeight;
-	console.log(event.target.id);
-
 	if (event.target.id === "stereoFormatSideBySideRL") {
 		stereoFormatSideBySideRL.innerHTML = "&#x2713; Side-by-Side RL";
 		stereoFormatSideBySideLR.innerHTML = "&#x2751; Side-by-Side LR";
@@ -1027,11 +1026,15 @@ function animateVideo(timestamp) {
 	}
 }
 
-function getParameterByName(name) {
-	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-	var results = regex.exec(location.search);
-	return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+function getSearchParameters() {
+	var search = window.location.search.substring(1, window.location.search.length);
+	var params = search.split("&");
+	var paramDict = {};
+	for (var i=0; i<params.length; i++) {
+		var keyval = params[i].split("=");
+		paramDict[keyval[0]] = keyval[1] || null;
+	}
+	return paramDict;
 }
 
 function secondsToHMMSS(sec) {
