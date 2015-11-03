@@ -30,6 +30,7 @@ var loadWithAnonymousURL;
 var loadAnimationReq;
 var nativeWidth;
 var nativeHeight;
+var resetStereoMode;
 
 function init() {
 	document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
@@ -63,6 +64,7 @@ function init() {
 	animationTimeout = null;
 	loadWithAnonymousURL = false;
 	loadAnimationReq = null;
+	resetStereoMode = true;
 
 	menuTable.className = "fadeIn";
 	stereoModeOptions.className = "fadeIn";
@@ -126,6 +128,18 @@ function init() {
 	img.addEventListener('error', imageError, false);
 
 	resize();
+
+	var reqVid = getParameterByName("video");
+	if (reqVid !== "") {
+		var reqMode = getParameterByName("mode");
+		if (reqMode === "") reqMode = "anaglyph_rc";
+		var reqFormat = getParameterByName("format");
+		if (reqFormat === "") reqFormat = "side-by-side_rl";
+		var reqRes = getParameterByName("resolution");
+		if (reqRes === "") reqRes = "native";
+
+		initializeVideoNoUI(reqVid, reqMode, reqFormat, reqRes);
+	}
 }
 
 function resize() {
@@ -407,6 +421,7 @@ function showStereoFormatOptions(event) {
 function changeStereoFormat(event) {
 	var videoWidth;
 	var videoHeight;
+	console.log(event.target.id);
 
 	if (event.target.id === "stereoFormatSideBySideRL") {
 		stereoFormatSideBySideRL.innerHTML = "&#x2713; Side-by-Side RL";
@@ -831,6 +846,36 @@ function videoUrlSelected(event) {
 	videoUrlDialog.style.display = "none";
 }
 
+function initializeVideoNoUI(videoURL, videoMode, videoFormat, videoResolution) {
+	menuTable.style.display = "none";
+	stereoModeOptions.style.display = "none";
+	stereoFormatOptions.style.display = "none";
+	volumeSliderContainer.style.display = "none";
+
+	setTimeout(function() {
+		var modeId = "stereoModeAnaglyphRC";
+		if (videoMode === "anaglyph_gm") modeId = "stereoModeAnaglyphGM";
+		else if (videoMode === "interleave") modeId = "stereoModeInterleave";
+		else if (videoMode === "left") modeId = "stereoModeLeftEye";
+		else if (videoMode === "right") modeId = "stereoModeRightEye";
+		else if (videoMode === "none") modeId = "stereoModeNone";
+		var formatId = "stereoFormatSideBySideRL";
+		if (videoFormat === "side-by-side_lr") formatId = "stereoFormatSideBySideLR";
+		else if (videoFormat === "top-bottom_rl") formatId = "stereoFormatTopBottomRL";
+		else if (videoFormat === "top-bottom_lr") formatId = "stereoFormatTopBottomLR";
+		var resId = "stereoFormatNativeResolution";
+		if (videoResolution === "2x") resId = "stereoFormat2XResolution";
+
+		resetStereoMode = false;
+		changeStereoMode({target: {id: modeId}});
+		changeStereoFormat({target: {id: formatId}});
+		changeStereoFormat({target: {id: resId}});
+
+		videoUrlDialogText.value = videoURL;
+		videoUrlSelected({});
+	}, 500);
+}
+
 function videoErrorDialogClosed(event) {
 	videoErrorDialog.style.display = "none";
 }
@@ -873,7 +918,7 @@ function videoMetaData(event) {
 		console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
 		videoAspect = videoWidth / videoHeight;
 		videoControls.style.display = "block";
-		changeStereoMode({target: {id: "stereoModeNone"}});
+		if (resetStereoMode === true) changeStereoMode({target: {id: "stereoModeNone"}});
 		resize();
 	}
 }
@@ -980,6 +1025,13 @@ function animateVideo(timestamp) {
 			animationReq = requestAnimationFrame(animateVideo);
 		}, 33-dt);
 	}
+}
+
+function getParameterByName(name) {
+	name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+	var results = regex.exec(location.search);
+	return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
 function secondsToHMMSS(sec) {
