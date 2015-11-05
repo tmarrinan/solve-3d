@@ -927,6 +927,7 @@ function initializeVideoNoUI(videoURL, videoMode, videoFormat, videoResolution) 
 	setTimeout(function() {
 		var modeId = "stereoModeAnaglyphRC";
 		if (videoMode === "anaglyph_gm") modeId = "stereoModeAnaglyphGM";
+		else if (videoMode === "anaglyph_ab") modeId = "stereoModeAnaglyphAB";
 		else if (videoMode === "interleave") modeId = "stereoModeInterleave";
 		else if (videoMode === "left") modeId = "stereoModeLeftEye";
 		else if (videoMode === "right") modeId = "stereoModeRightEye";
