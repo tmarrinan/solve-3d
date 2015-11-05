@@ -68,6 +68,13 @@ body {
 	border-color: #FFFFFF;
 }
 
+#anaglyphAmberBlueImg1 {
+	margin-left: 8px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #FFFFFF;
+}
+
 #anaglyphRedCyanImg2 {
 	margin-left: 8px;
 	border-style: solid;
@@ -76,6 +83,13 @@ body {
 }
 
 #anaglyphGreenMagentaImg2 {
+	margin-left: 8px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #787878;
+}
+
+#anaglyphAmberBlueImg2 {
 	margin-left: 8px;
 	border-style: solid;
 	border-width: 1px;

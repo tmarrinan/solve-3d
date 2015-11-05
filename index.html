@@ -225,12 +225,15 @@ function changeStereoMode(event) {
 	var anaglyphRCImg2 = stereoModeAnaglyphRC.children[1];
 	var anaglyphGMImg1 = stereoModeAnaglyphGM.children[0];
 	var anaglyphGMImg2 = stereoModeAnaglyphGM.children[1];
+	var anaglyphABImg1 = stereoModeAnaglyphAB.children[0];
+	var anaglyphABImg2 = stereoModeAnaglyphAB.children[1];
 
 	if (event.target.id === "stereoModeAnaglyphRC") {
 		if (stereoModeAnaglyphRC.getAttribute("active") === false || stereoModeAnaglyphRC.getAttribute("active") === "false") return;
 
 		stereoModeAnaglyphRC.innerHTML = "&#x2713; Anaglyph";
 		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphAB.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
@@ -240,6 +243,8 @@ function changeStereoMode(event) {
 		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg1);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg2);
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_rc-rl");
@@ -265,6 +270,7 @@ function changeStereoMode(event) {
 
 		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
 		stereoModeAnaglyphGM.innerHTML = "&#x2713; Anaglyph";
+		stereoModeAnaglyphAB.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
@@ -274,6 +280,8 @@ function changeStereoMode(event) {
 		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg1);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg2);
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-rl");
@@ -294,9 +302,47 @@ function changeStereoMode(event) {
 
 		currentMode = "anaglyph_gm";
 	}
+	else if (event.target.id === "stereoModeAnaglyphAB") {
+		if (stereoModeAnaglyphAB.getAttribute("active") === false || stereoModeAnaglyphAB.getAttribute("active") === "false") return;
+
+		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphAB.innerHTML = "&#x2713; Anaglyph";
+		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
+		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
+		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
+		stereoModeNone.innerHTML = "&#x2751; None";
+		
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg1);
+		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
+		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg1);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg2);
+
+		if (currentFormat === "Side-by-Side RL") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_ab-rl");
+			myStereoVideo2D.updateStereoMode("anaglyph_ab-rl");
+		}
+		else if (currentFormat === "Side-by-Side LR") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_ab-lr");
+			myStereoVideo2D.updateStereoMode("anaglyph_ab-lr");
+		}
+		else if (currentFormat === "Top-Bottom RL") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_ab-tb");
+			myStereoVideo2D.updateStereoMode("anaglyph_ab-tb");
+		}
+		else {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_ab-bt");
+			myStereoVideo2D.updateStereoMode("anaglyph_ab-bt");
+		}
+
+		currentMode = "anaglyph_ab";
+	}
 	else if (event.target.id === "stereoModeInterleave") {
 		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
 		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphAB.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2713; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
@@ -306,6 +352,8 @@ function changeStereoMode(event) {
 		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg1);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg2);
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("interleave-rl");
@@ -329,6 +377,7 @@ function changeStereoMode(event) {
 	else if (event.target.id === "stereoModeLeftEye") {
 		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
 		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphAB.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2713; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
@@ -338,6 +387,8 @@ function changeStereoMode(event) {
 		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg1);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg2);
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("right");
@@ -361,6 +412,7 @@ function changeStereoMode(event) {
 	else if (event.target.id === "stereoModeRightEye") {
 		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
 		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphAB.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2713; Right Eye";
@@ -370,6 +422,8 @@ function changeStereoMode(event) {
 		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg1);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg2);
 
 		if (currentFormat === "Side-by-Side RL") {
 			myStereoVideoWebGL.updateStereoMode("left");
@@ -393,6 +447,7 @@ function changeStereoMode(event) {
 	else {
 		stereoModeAnaglyphRC.innerHTML = "&#x2751; Anaglyph";
 		stereoModeAnaglyphGM.innerHTML = "&#x2751; Anaglyph";
+		stereoModeAnaglyphAB.innerHTML = "&#x2751; Anaglyph";
 		stereoModeInterleave.innerHTML = "&#x2751; Interleave";
 		stereoModeLeftEye.innerHTML = "&#x2751; Left Eye";
 		stereoModeRightEye.innerHTML = "&#x2751; Right Eye";
@@ -402,6 +457,8 @@ function changeStereoMode(event) {
 		stereoModeAnaglyphRC.appendChild(anaglyphRCImg2);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg1);
 		stereoModeAnaglyphGM.appendChild(anaglyphGMImg2);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg1);
+		stereoModeAnaglyphAB.appendChild(anaglyphABImg2);
 
 		myStereoVideoWebGL.updateStereoMode("whole");
 		myStereoVideo2D.updateStereoMode("whole");
@@ -435,6 +492,10 @@ function changeStereoFormat(event) {
 		else if (currentMode === "anaglyph_gm") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-rl");
 			myStereoVideo2D.updateStereoMode("anaglyph_gm-rl");
+		}
+		else if (currentMode === "anaglyph_ab") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_ab-rl");
+			myStereoVideo2D.updateStereoMode("anaglyph_ab-rl");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-rl");
@@ -479,6 +540,10 @@ function changeStereoFormat(event) {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-lr");
 			myStereoVideo2D.updateStereoMode("anaglyph_gm-lr");
 		}
+		else if (currentMode === "anaglyph_ab") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_ab-lr");
+			myStereoVideo2D.updateStereoMode("anaglyph_ab-lr");
+		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-lr");
 			myStereoVideo2D.updateStereoMode("interleave-lr");
@@ -522,6 +587,10 @@ function changeStereoFormat(event) {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-tb");
 			myStereoVideo2D.updateStereoMode("anaglyph_gm-tb");
 		}
+		else if (currentMode === "anaglyph_ab") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_ab-tb");
+			myStereoVideo2D.updateStereoMode("anaglyph_ab-tb");
+		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-tb");
 			myStereoVideo2D.updateStereoMode("interleave-tb");
@@ -564,6 +633,10 @@ function changeStereoFormat(event) {
 		else if (currentMode === "anaglyph_gm") {
 			myStereoVideoWebGL.updateStereoMode("anaglyph_gm-bt");
 			myStereoVideo2D.updateStereoMode("anaglyph_gm-bt");
+		}
+		else if (currentMode === "anaglyph_ab") {
+			myStereoVideoWebGL.updateStereoMode("anaglyph_ab-bt");
+			myStereoVideo2D.updateStereoMode("anaglyph_ab-bt");
 		}
 		else if (currentMode === "interleave") {
 			myStereoVideoWebGL.updateStereoMode("interleave-bt");
@@ -1107,10 +1180,11 @@ function httpGet(url, callback) {
 		<ul id="stereoModeOptionsList">
 			<li id="stereoModeAnaglyphRC" class="videoMenuOptionsOdd">&#x2751; Anaglyph<img id="anaglyphRedCyanImg1" class="active" src="images/red-cyan.png" width="14" height="14"><img id="anaglyphRedCyanImg2" class="inactive" src="images/red-cyan_inactive.png" width="14" height="14"></li>
 			<li id="stereoModeAnaglyphGM" class="videoMenuOptionsEven">&#x2751; Anaglyph<img id="anaglyphGreenMagentaImg1" class="active" src="images/green-magenta.png" width="14" height="14"><img id="anaglyphGreenMagentaImg2" class="inactive" src="images/green-magenta_inactive.png" width="14" height="14"></li>
-			<li id="stereoModeInterleave" class="videoMenuOptionsOdd">&#x2751; Interleave</li>
-			<li id="stereoModeLeftEye" class="videoMenuOptionsEven">&#x2751; Left Eye</li>
-			<li id="stereoModeRightEye" class="videoMenuOptionsOdd">&#x2751; Right Eye</li>
-			<li id="stereoModeNone" class="videoMenuOptionsEven">&#x2713; None</li>
+			<li id="stereoModeAnaglyphAB" class="videoMenuOptionsOdd">&#x2751; Anaglyph<img id="anaglyphAmberBlueImg1" class="active" src="images/amber-blue.png" width="14" height="14"><img id="anaglyphAmberBlueImg2" class="inactive" src="images/amber-blue_inactive.png" width="14" height="14"></li>
+			<li id="stereoModeInterleave" class="videoMenuOptionsEven">&#x2751; Interleave</li>
+			<li id="stereoModeLeftEye" class="videoMenuOptionsOdd">&#x2751; Left Eye</li>
+			<li id="stereoModeRightEye" class="videoMenuOptionsEven">&#x2751; Right Eye</li>
+			<li id="stereoModeNone" class="videoMenuOptionsOdd">&#x2713; None</li>
 		</ul>
 	</div>
 	<div id="stereoFormatOptions">

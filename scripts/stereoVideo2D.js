@@ -50,6 +50,18 @@ stereoVideo2D.prototype.draw = function() {
 		case "anaglyph_gm-bt":
 			this.drawAnaglyphGMBT();
 			break;
+		case "anaglyph_ab-rl":
+			this.drawAnaglyphABRL();
+			break;
+		case "anaglyph_ab-lr":
+			this.drawAnaglyphABLR();
+			break;
+		case "anaglyph_ab-tb":
+			this.drawAnaglyphABTB();
+			break;
+		case "anaglyph_ab-bt":
+			this.drawAnaglyphABBT();
+			break;
 		case "interleave-rl":
 			this.drawInterleaveRL();
 			break;
@@ -107,6 +119,11 @@ stereoVideo2D.prototype.processAnaglyph = function(leftEye, rightEye, colormode)
 		idg = iData1;
 		idb = iData2;
 	}
+	else if (colormode === "amber-blue") {
+		idr = iData2;
+		idg = iData2;
+		idb = iData1;
+	}
 
 	for (x=0; x<y; x++) {
 		g = idr.data[index + 1] + 0.45 * Math.max(0, idr.data[index + 0] - idr.data[index + 1]);
@@ -117,16 +134,62 @@ stereoVideo2D.prototype.processAnaglyph = function(leftEye, rightEye, colormode)
 		r = Math.min(Math.max(r, 0), 255);
 		g = Math.min(Math.max(g, 0), 255);
 		b = Math.min(Math.max(b, 0), 255);
-		oData.data[index++] = r;
-		oData.data[index++] = g;
-		oData.data[index++] = b;
-		oData.data[index++] = 255;
+		oData.data[index + 0] = r;
+		oData.data[index + 1] = g;
+		oData.data[index + 2] = b;
+		oData.data[index + 3] = 255;
+		index += 4;
 	}
 
 	tmpCtx.putImageData(oData, 0, 0);
 
 	this.ctx.drawImage(tmpCanvas, 0, 0, rightEye.width, rightEye.height, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-}
+};
+
+stereoVideo2D.prototype.processAnaglyphCC = function(leftEye, rightEye, colormode) {
+	var rIdx, gIdx, bIdx;
+	var x = 0;
+	var y = rightEye.width * rightEye.height;
+	var index = 0;
+
+	var tmpCanvas = document.createElement('canvas');
+	var tmpCtx = tmpCanvas.getContext('2d');
+	tmpCanvas.width  = nativeWidth;
+	tmpCanvas.height = nativeHeight;
+
+	tmpCtx.drawImage(this.video, 0, 0, nativeWidth, nativeHeight);
+	var iData1 = tmpCtx.getImageData(rightEye.x, rightEye.y, rightEye.width, rightEye.height);
+	var iData2 = tmpCtx.getImageData(leftEye.x, leftEye.y, leftEye.width, leftEye.height);
+	var oData = tmpCtx.createImageData(rightEye.width, rightEye.height);
+
+	if (colormode === "red-cyan") {
+		rIdx = 2;
+		gIdx = 1;
+		bIdx = 0;
+	}
+	else if (colormode === "green-magenta") {
+		rIdx = 0;
+		gIdx = 2;
+		bIdx = 1;
+	}
+	else if (colormode === "amber-blue") {
+		rIdx = 1;
+		gIdx = 0;
+		bIdx = 2;
+	}
+
+	for (x=0; x<y; x++) {
+		oData.data[index + rIdx] = iData2.data[index + rIdx];
+		oData.data[index + gIdx] = iData2.data[index + gIdx];
+		oData.data[index + bIdx] = parseInt(iData1.data[index + rIdx]*0.15 + iData1.data[index + gIdx]*0.15 + iData1.data[index + bIdx]*0.7, 10);
+		oData.data[index + 3] = 255;
+		index += 4;
+	}
+
+	tmpCtx.putImageData(oData, 0, 0);
+
+	this.ctx.drawImage(tmpCanvas, 0, 0, rightEye.width, rightEye.height, 0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+};
 
 stereoVideo2D.prototype.processInterleave = function(leftEye, rightEye) {
 	// draw right eye
@@ -160,7 +223,7 @@ stereoVideo2D.prototype.drawAnaglyphRCRL = function() {
 	var rightEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
 	
 	this.processAnaglyph(leftEye, rightEye, "red-cyan");
-}
+};
 
 stereoVideo2D.prototype.drawAnaglyphRCLR = function() {
 	var halfWidth = parseInt(nativeWidth / 2, 10);
@@ -169,7 +232,7 @@ stereoVideo2D.prototype.drawAnaglyphRCLR = function() {
 	var rightEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
 	
 	this.processAnaglyph(leftEye, rightEye, "red-cyan");
-}
+};
 
 stereoVideo2D.prototype.drawAnaglyphRCTB = function() {
 	var halfHeight = parseInt(nativeHeight / 2, 10);
@@ -178,7 +241,7 @@ stereoVideo2D.prototype.drawAnaglyphRCTB = function() {
 	var rightEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
 	
 	this.processAnaglyph(leftEye, rightEye, "red-cyan");
-}
+};
 
 stereoVideo2D.prototype.drawAnaglyphRCBT = function() {
 	var halfHeight = parseInt(nativeHeight / 2, 10);
@@ -187,7 +250,7 @@ stereoVideo2D.prototype.drawAnaglyphRCBT = function() {
 	var rightEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
 	
 	this.processAnaglyph(leftEye, rightEye, "red-cyan");
-}
+};
 
 stereoVideo2D.prototype.drawAnaglyphGMRL = function() {
 	var halfWidth = parseInt(nativeWidth / 2, 10);
@@ -196,7 +259,7 @@ stereoVideo2D.prototype.drawAnaglyphGMRL = function() {
 	var rightEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
 	
 	this.processAnaglyph(leftEye, rightEye, "green-magenta");
-}
+};
 
 stereoVideo2D.prototype.drawAnaglyphGMLR = function() {
 	var halfWidth = parseInt(nativeWidth / 2, 10);
@@ -205,7 +268,7 @@ stereoVideo2D.prototype.drawAnaglyphGMLR = function() {
 	var rightEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
 	
 	this.processAnaglyph(leftEye, rightEye, "green-magenta");
-}
+};
 
 stereoVideo2D.prototype.drawAnaglyphGMTB = function() {
 	var halfHeight = parseInt(nativeHeight / 2, 10);
@@ -214,7 +277,7 @@ stereoVideo2D.prototype.drawAnaglyphGMTB = function() {
 	var rightEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
 	
 	this.processAnaglyph(leftEye, rightEye, "green-magenta");
-}
+};
 
 stereoVideo2D.prototype.drawAnaglyphGMBT = function() {
 	var halfHeight = parseInt(nativeHeight / 2, 10);
@@ -223,7 +286,43 @@ stereoVideo2D.prototype.drawAnaglyphGMBT = function() {
 	var rightEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
 	
 	this.processAnaglyph(leftEye, rightEye, "green-magenta");
-}
+};
+
+stereoVideo2D.prototype.drawAnaglyphABRL = function() {
+	var halfWidth = parseInt(nativeWidth / 2, 10);
+
+	var leftEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
+	var rightEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
+	
+	this.processAnaglyphCC(leftEye, rightEye, "amber-blue");
+};
+
+stereoVideo2D.prototype.drawAnaglyphABLR = function() {
+	var halfWidth = parseInt(nativeWidth / 2, 10);
+
+	var leftEye = {x: 0, y: 0, width: halfWidth, height: nativeHeight};
+	var rightEye = {x: halfWidth, y: 0, width: halfWidth, height: nativeHeight};
+	
+	this.processAnaglyphCC(leftEye, rightEye, "amber-blue");
+};
+
+stereoVideo2D.prototype.drawAnaglyphABTB = function() {
+	var halfHeight = parseInt(nativeHeight / 2, 10);
+
+	var leftEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
+	var rightEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
+	
+	this.processAnaglyphCC(leftEye, rightEye, "amber-blue");
+};
+
+stereoVideo2D.prototype.drawAnaglyphABBT = function() {
+	var halfHeight = parseInt(nativeHeight / 2, 10);
+
+	var leftEye = {x: 0, y: halfHeight, width: nativeWidth, height: halfHeight};
+	var rightEye = {x: 0, y: 0, width: nativeWidth, height: halfHeight};
+	
+	this.processAnaglyphCC(leftEye, rightEye, "amber-blue");
+};
 
 stereoVideo2D.prototype.drawInterleaveRL = function() {
 	var halfWidth = parseInt(nativeWidth / 2, 10);
