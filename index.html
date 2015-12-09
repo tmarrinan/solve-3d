@@ -147,7 +147,7 @@ function init() {
 	videoErrorDialogCloseBtn.addEventListener('click', videoErrorDialogClosed, false);
 	video.addEventListener('error', videoError, false);
 	video.addEventListener('loadedmetadata', videoMetaData, false);
-	video.addEventListener('canplaythrough', videoCanPlayThrough, false);
+	video.addEventListener('canplay', videoCanPlay, false);
 	video.addEventListener('timeupdate', videoTimeUpdate, false);
 	img.addEventListener('load', imageLoaded, false);
 	img.addEventListener('error', imageError, false);
@@ -1007,10 +1007,6 @@ function videoError(event) {
 
 function videoMetaData(event) {
 	if (event.target.id === "video") {
-		console.log("remove initVideo event");
-		document.removeEventListener('click', initVideo, false);
-		video.pause();
-
 		nativeWidth = event.target.videoWidth;
 		nativeHeight = event.target.videoHeight;
 		console.log("Full video size: " + nativeWidth + "x" + nativeHeight);
@@ -1026,16 +1022,21 @@ function videoMetaData(event) {
 		}
 		console.log("Rendered video size: " + videoWidth + "x" + videoHeight);
 		videoAspect = videoWidth / videoHeight;
-		videoControls.style.display = "block";
 		if (resetStereoMode === true) changeStereoMode({target: {id: "stereoModeNone"}});
 		resize();
 	}
 }
 
-function videoCanPlayThrough(event) {
+function videoCanPlay(event) {
 	if (event.target.id === "video") {
 		if (videoLoaded === false) {
+			console.log("remove initVideo event");
+			document.removeEventListener('click', initVideo, false);
+			video.pause();
+
 			stopLoadAnimation();
+			videoControls.style.display = "block";
+			
 			videoLoaded = true;
 			stereoVideo.initTextures(video);
 			stereoVideo.draw();
@@ -1046,7 +1047,7 @@ function videoCanPlayThrough(event) {
 				videoControlsPlay.style.display = "block";
 				videoControlsPause.style.display = "none";
 			}
-		}		
+		}	
 	}
 }
 
