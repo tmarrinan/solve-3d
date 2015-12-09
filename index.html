@@ -912,7 +912,7 @@ function videoUrlSelected(event) {
 
 			loadWithAnonymousURL = true;
 			video.crossOrigin = "anonymous";
-			video.src = videoUrlDialogText.value;;
+			video.src = videoUrlDialogText.value;
 		}
 	}
 	videoUrlDialog.style.display = "none";
@@ -1004,7 +1004,6 @@ function videoCanPlayThrough(event) {
 			stereoVideo.initTextures(video);
 			stereoVideo.draw();
 			playVideo(event);
-			
 		}		
 	}
 }
