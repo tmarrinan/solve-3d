@@ -939,8 +939,15 @@ function videoUrlSelected(event) {
 			video.crossOrigin = "anonymous";
 			video.src = videoUrlDialogText.value;
 		}
+		console.log("add initVideo event");
+		document.addEventListener('click', initVideo, false);
 	}
 	videoUrlDialog.style.display = "none";
+}
+
+function initVideo(event) {
+	console.log("init vid");
+	video.play();
 }
 
 function initializeVideoNoUI(videoURL, videoMode, videoFormat, videoResolution) {
@@ -971,7 +978,7 @@ function initializeVideoNoUI(videoURL, videoMode, videoFormat, videoResolution) 
 
 		videoUrlDialogText.value = videoURL;
 		videoUrlSelected({});
-	}, 500);
+	}, 1000);
 }
 
 function videoErrorDialogClosed(event) {
@@ -1000,6 +1007,10 @@ function videoError(event) {
 
 function videoMetaData(event) {
 	if (event.target.id === "video") {
+		console.log("remove initVideo event");
+		document.removeEventListener('click', initVideo, false);
+		video.pause();
+
 		nativeWidth = event.target.videoWidth;
 		nativeHeight = event.target.videoHeight;
 		console.log("Full video size: " + nativeWidth + "x" + nativeHeight);
@@ -1032,8 +1043,8 @@ function videoCanPlayThrough(event) {
 				playVideo(event);
 			}
 			else {
-				videoControlsPlay.style.display = "none";
-				videoControlsPause.style.display = "block";
+				videoControlsPlay.style.display = "block";
+				videoControlsPause.style.display = "none";
 			}
 		}		
 	}
