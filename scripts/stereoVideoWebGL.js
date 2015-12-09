@@ -157,7 +157,7 @@ stereoVideoWebGL.prototype.initTextures = function(videoElement) {
 	this.rgbaTexture = this.gl.createTexture();
 
 	this.gl.bindTexture(this.gl.TEXTURE_2D, this.rgbaTexture);
-	this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, videoElement);
+	this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGB, this.gl.RGB, this.gl.UNSIGNED_BYTE, videoElement);
 
 	this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
 	this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
@@ -171,7 +171,12 @@ stereoVideoWebGL.prototype.updateTextures = function(videoElement) {
 	if (this.rgbaTexture === null) return;
 	
 	this.gl.bindTexture(this.gl.TEXTURE_2D, this.rgbaTexture);
-	this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, videoElement);
+	if (browser && !browser.isMobile) {
+		this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGB, this.gl.UNSIGNED_BYTE, videoElement);
+	}
+	else {
+		this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGB, this.gl.RGB, this.gl.UNSIGNED_BYTE, videoElement);
+	}
 	this.gl.bindTexture(this.gl.TEXTURE_2D, null);
 };
 

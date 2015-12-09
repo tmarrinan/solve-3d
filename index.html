@@ -8,6 +8,7 @@
 <script type="text/javascript" src="scripts/stereoVideo2D.js"></script>
 <script type="text/javascript" src="scripts/loadAnimation.js"></script>
 <script type="text/javascript">
+var browser;
 var supportsWebGL;
 var videoCtxWebGL;
 var videoCtx2D;
@@ -35,6 +36,30 @@ var resetStereoMode;
 function init() {
 	document.exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
 	document.body.requestFullscreen = document.body.requestFullscreen || document.body.webkitRequestFullscreen || document.body.mozRequestFullScreen || document.body.msRequestFullscreen;
+
+	var userAgent = window.navigator.userAgent.toLowerCase();
+	browser = {};
+	browser.isOpera    = userAgent.indexOf("opera") >= 0;
+	browser.isIE       = !browser.isOpera && (userAgent.indexOf("edge") >= 0 || userAgent.indexOf("msie") >= 0 || userAgent.indexOf("trident") >= 0);
+	browser.isChrome   = !browser.isIE && userAgent.indexOf("chrome") >= 0;
+	browser.isWebKit   = userAgent.indexOf("webkit") >= 0;
+	browser.isSafari   = !browser.isChrome && !browser.isIE && userAgent.indexOf("safari") >= 0;
+	browser.isGecko    = !browser.isWebKit && userAgent.indexOf("gecko") >= 0;
+	browser.isFirefox  = browser.isGecko && userAgent.indexOf("firefox") >= 0;
+	browser.isWinPhone = userAgent.indexOf("windows phone") >= 0;
+	browser.isIPhone   = userAgent.indexOf("iphone") >= 0;
+	browser.isIPad     = userAgent.indexOf("ipad") >= 0;
+	browser.isIPod     = userAgent.indexOf("ipod") >= 0;
+	browser.isIOS      = !browser.isWinPhone && (browser.isIPhone || browser.isIPad || browser.isIPod);
+	browser.isAndroid  = userAgent.indexOf("android") >= 0;
+	browser.isAndroidTablet = (userAgent.indexOf("android") >= 0) && !(userAgent.indexOf("mobile") >= 0);
+	browser.isWindows  = userAgent.indexOf("windows") >= 0 || userAgent.indexOf("win32") >= 0;
+	browser.isMac      = !browser.isIOS && (userAgent.indexOf("macintosh") >= 0 || userAgent.indexOf("mac os x") >= 0);
+	browser.isLinux    = userAgent.indexOf("linux") >= 0;
+	// Mobile clients
+	browser.isMobile   = browser.isWinPhone || browser.isIOS || browser.isAndroid;
+	// Keep a copy of the UA
+	browser.userAgent  = userAgent;
 
 	videoAspect = 1.777777778;
 	videoStretch = 1.0;
@@ -1003,7 +1028,9 @@ function videoCanPlayThrough(event) {
 			videoLoaded = true;
 			stereoVideo.initTextures(video);
 			stereoVideo.draw();
-			playVideo(event);
+			if (browser && !browser.isMobile) {
+				playVideo(event);
+			}
 		}		
 	}
 }
