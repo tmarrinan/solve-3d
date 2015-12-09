@@ -1031,6 +1031,10 @@ function videoCanPlayThrough(event) {
 			if (browser && !browser.isMobile) {
 				playVideo(event);
 			}
+			else {
+				videoControlsPlay.style.display = "none";
+				videoControlsPause.style.display = "block";
+			}
 		}		
 	}
 }
